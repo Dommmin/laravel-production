@@ -56,7 +56,7 @@ jobs:
 
       - name: Create .env file from GitHub Variables
         run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
+          echo "${{ vars.ENV_FILE }}" > .env
 
       - name: Create remote directories
         run: |

@@ -1,43 +1,53 @@
+# Stage 1: Build frontend assets with Vite
+FROM node:22-alpine AS node-builder
+WORKDIR /var/www
+
+# Copy Node files
+COPY package*.json vite.config.ts tsconfig.json ./
+# Copy source
+COPY resources resources
+
+# Install and build
+RUN npm ci
+RUN npm run build
+
+# Stage 2: Build PHP application
 FROM php:8.4-fpm-alpine
 
-# Install dependencies
+# Install PHP and system dependencies
 RUN apk add --no-cache \
     git curl libpng-dev libxml2-dev zip unzip \
-    nodejs npm freetype-dev libjpeg-turbo-dev \
-    libwebp-dev zlib-dev libzip-dev oniguruma-dev \
+    freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev libzip-dev oniguruma-dev \
     postgresql-dev supervisor
 
-# Configure PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Ensure PHP-FPM directory exists
-RUN mkdir -p /usr/local/etc/php-fpm.d
-
+# Prepare directories
 WORKDIR /var/www
-
-# Create storage structure first
-RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
-    && mkdir -p storage/app/public \
-    && mkdir -p storage/logs
 
 RUN mkdir -p /var/log/supervisor \
     && mkdir -p /var/run/supervisor \
     && chown -R www-data:www-data /var/log/supervisor /var/run/supervisor
 
-# Copy application files
+# Copy application source
 COPY . .
 
-# Set permissions (now the directories exist)
-RUN chown -R www-data:www-data /var/www/storage \
-    && chmod -R 775 /var/www/storage
+# Copy built assets from node-builder (Vite default output folder: public/build)
+COPY --from=node-builder /var/www/public/build public/build
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
+# Copy Supervisor config
+COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
+
+# Expose FPM port
 EXPOSE 9000
 
+# Start supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

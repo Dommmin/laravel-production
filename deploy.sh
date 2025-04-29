@@ -28,7 +28,7 @@ fi
 
 # Pobieranie najnowszych obrazów
 echo -e "${GREEN}Pobieranie najnowszych obrazów...${NC}"
-docker-compose -f docker-compose.yml pull || {
+docker compose pull || {
   echo -e "${RED}Błąd podczas pobierania obrazów!${NC}"
   echo -e "${YELLOW}Sprawdzam szczegóły obrazu...${NC}"
 
@@ -55,7 +55,6 @@ docker-compose -f docker-compose.yml pull || {
     if docker pull "${BRANCH_IMAGE_NAME}"; then
       echo -e "${GREEN}Obraz został pomyślnie pobrany: ${BRANCH_IMAGE_NAME}${NC}"
 
-      # Ponieważ docker-compose używa tagu z .env, tagujemy też jako TAG z .env
       echo -e "${YELLOW}Tagowanie obrazu jako ${FULL_IMAGE_NAME}${NC}"
       docker tag "${BRANCH_IMAGE_NAME}" "${FULL_IMAGE_NAME}"
     else
@@ -71,16 +70,14 @@ docker-compose -f docker-compose.yml pull || {
   fi
 }
 
-# Uruchomienie kontenerów
 echo -e "${GREEN}Uruchamianie kontenerów...${NC}"
-docker-compose -f docker-compose.yml up -d
+docker compose up -d
 
-# Sprawdzenie, czy kontenery działają
-if docker-compose -f docker-compose.yml ps | grep -q "Up"; then
+if docker compose ps | grep -q "Up"; then
   echo -e "${GREEN}Kontenery uruchomione pomyślnie.${NC}"
 else
   echo -e "${RED}Niektóre kontenery mogą nie działać poprawnie. Sprawdź logi.${NC}"
-  docker-compose -f docker-compose.yml logs
+  docker compose logs
 fi
 
 # Wykonanie zadań po deploymencie (migracje, cache, itd.)

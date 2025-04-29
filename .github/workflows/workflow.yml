@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: dommmin/laravel-production
 
 jobs:
   build-and-push:
@@ -54,22 +54,15 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Create .env file from GitHub Variables
+      - name: Create .env file
         run: |
           echo "${{ vars.ENV_FILE }}" > .env
 
-      - name: Create remote directories
+      - name: Upload files
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel/docker/nginx/conf.d /home/${{ secrets.SSH_USER }}/laravel/docker/php /home/${{ secrets.SSH_USER }}/laravel/docker/nginx/ssl"
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel"
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.production.yml .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/
 
-      - name: Upload configuration files
-        run: |
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker-compose.yml
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/.env
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/nginx/conf.d/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/
-
-      - name: Run deploy script on server
+      - name: Deploy on Server
         run: |
           ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /home/${{ secrets.SSH_USER }}/laravel && chmod +x deploy.sh && ./deploy.sh"

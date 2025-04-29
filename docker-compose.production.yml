@@ -1,7 +1,7 @@
 services:
   app:
     image: ${REGISTRY}/${IMAGE_NAME}:${TAG:-latest}
-    container_name: ${COMPOSE_PROJECT_NAME}_app
+    container_name: ${COMPOSE_PROJECT_NAME:-laravel}_app
     restart: always
     working_dir: /var/www
     volumes:
@@ -20,7 +20,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: ${COMPOSE_PROJECT_NAME}_nginx
+    container_name: ${COMPOSE_PROJECT_NAME:-laravel}_nginx
     restart: always
     ports:
       - "80:80"
@@ -37,7 +37,7 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: ${COMPOSE_PROJECT_NAME}_redis
+    container_name: ${COMPOSE_PROJECT_NAME:-laravel}_redis
     restart: always
     ports:
       - "6379:6379"

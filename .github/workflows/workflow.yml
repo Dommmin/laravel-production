@@ -79,6 +79,7 @@ jobs:
           scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker-compose.yml
           scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/
           scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/php/php.ini docker/php/www.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/php/
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/nginx/conf.d/
           scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/
 
       - name: Deploy on Server

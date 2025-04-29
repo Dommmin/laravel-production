@@ -11,7 +11,7 @@ services:
       - ./docker/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
       - ./docker/supervisord.conf:/etc/supervisor/supervisord.conf
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      test: ["CMD", "php-fpm", "-t"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,7 +26,6 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./:/var/www
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
       - ./docker/nginx/ssl:/etc/nginx/ssl
       - nginx_logs:/var/log/nginx

@@ -40,10 +40,6 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/storage
-RUN chmod -R 775 /var/www/storage
-
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
@@ -51,4 +47,4 @@ COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 EXPOSE 9000
 
 # Start supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"] 
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

@@ -15,9 +15,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
     networks:
       - laravel-network
 

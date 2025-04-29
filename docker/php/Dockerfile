@@ -11,10 +11,22 @@ RUN apk add --no-cache \
     supervisor \
     nginx \
     nodejs \
-    npm
+    npm \
+    # Dependencies for PHP extensions
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libwebp-dev \
+    zlib-dev \
+    libxpm-dev \
+    libzip-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    postgresql-dev
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

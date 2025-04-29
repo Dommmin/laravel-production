@@ -23,11 +23,9 @@ chmod -R 775 storage bootstrap/cache
 # Create .env file from GitHub secret
 echo "$ENV_FILE" > .env
 
-# Pull and start containers
 docker compose -f docker-compose.yml pull
 docker compose -f docker-compose.yml up -d
 
-# Run migrations and optimize
-docker compose -f docker compose.yml exec -T app php artisan migrate --force
-docker compose -f docker compose.yml exec -T app php artisan optimize:clear
-docker compose -f docker compose.yml exec -T app php artisan optimize
+docker compose -f docker-compose.yml exec -T app php artisan migrate --force
+docker compose -f docker-compose.yml exec -T app php artisan optimize:clear
+docker compose -f docker-compose.yml exec -T app php artisan optimize

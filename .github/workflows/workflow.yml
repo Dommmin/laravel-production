@@ -58,9 +58,9 @@ jobs:
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
 
-      - name: Ensure remote base directory exists
+      - name: Create remote directories
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel"
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel/docker/nginx/conf.d /home/${{ secrets.SSH_USER }}/laravel/docker/php /home/${{ secrets.SSH_USER }}/laravel/docker/nginx/ssl"
 
       - name: Upload configuration files
         run: |

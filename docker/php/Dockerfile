@@ -24,6 +24,10 @@ RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
     && mkdir -p storage/app/public \
     && mkdir -p storage/logs
 
+RUN mkdir -p /var/log/supervisor \
+    && mkdir -p /var/run/supervisor \
+    && chown -R www-data:www-data /var/log/supervisor /var/run/supervisor
+
 # Copy application files
 COPY . .
 

@@ -28,7 +28,7 @@ fi
 
 # Pobieranie najnowszych obrazów
 echo -e "${GREEN}Pobieranie najnowszych obrazów...${NC}"
-docker-compose -f docker-compose.production.yml pull || {
+docker-compose -f docker-compose.yml pull || {
   echo -e "${RED}Błąd podczas pobierania obrazów!${NC}"
   echo -e "${YELLOW}Sprawdzam szczegóły obrazu...${NC}"
 
@@ -73,14 +73,14 @@ docker-compose -f docker-compose.production.yml pull || {
 
 # Uruchomienie kontenerów
 echo -e "${GREEN}Uruchamianie kontenerów...${NC}"
-docker-compose -f docker-compose.production.yml up -d
+docker-compose -f docker-compose.yml up -d
 
 # Sprawdzenie, czy kontenery działają
-if docker-compose -f docker-compose.production.yml ps | grep -q "Up"; then
+if docker-compose -f docker-compose.yml ps | grep -q "Up"; then
   echo -e "${GREEN}Kontenery uruchomione pomyślnie.${NC}"
 else
   echo -e "${RED}Niektóre kontenery mogą nie działać poprawnie. Sprawdź logi.${NC}"
-  docker-compose -f docker-compose.production.yml logs
+  docker-compose -f docker-compose.yml logs
 fi
 
 # Wykonanie zadań po deploymencie (migracje, cache, itd.)

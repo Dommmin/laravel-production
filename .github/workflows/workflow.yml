@@ -46,18 +46,32 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/deployer/laravel
+            
+            # Create .env file
             echo "${{ secrets.ENV_FILE }}" > .env
-            docker-compose -f docker-compose.production.yml pull
-            docker-compose -f docker-compose.production.yml up -d
-            docker-compose -f docker-compose.production.yml exec -T app php artisan migrate --force
-            docker-compose -f docker-compose.production.yml exec -T app php artisan optimize:clear
-            docker-compose -f docker-compose.production.yml exec -T app php artisan optimize
+            
+            # Copy docker-compose file
+            cp docker-compose.production.yml docker-compose.yml
+            
+            # Create necessary directories
+            mkdir -p docker/nginx/conf.d docker/nginx/ssl docker/php
+            
+            # Copy configuration files
+            cp docker/nginx/conf.d/default.conf docker/nginx/conf.d/
+            cp docker/supervisord.conf docker/
+            
+            # Make deploy script executable and run it
+            chmod +x deploy.sh
+            ./deploy.sh

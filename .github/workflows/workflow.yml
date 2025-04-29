@@ -49,29 +49,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy to production server
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.8.0
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd /home/deployer/laravel
-            
-            # Create .env file
-            echo "${{ secrets.ENV_FILE }}" > .env
-            
-            # Copy docker-compose file
-            cp docker-compose.production.yml docker-compose.yml
-            
-            # Create necessary directories
-            mkdir -p docker/nginx/conf.d docker/nginx/ssl docker/php
-            
-            # Copy configuration files
-            cp docker/nginx/conf.d/default.conf docker/nginx/conf.d/
-            cp docker/supervisord.conf docker/
-            
-            # Make deploy script executable and run it
-            chmod +x deploy.sh
-            ./deploy.sh
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Create .env file from GitHub Variables
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Ensure remote base directory exists
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel"
+
+      - name: Upload configuration files
+        run: |
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker-compose.yml
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/.env
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/nginx/conf.d/
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/
+
+      - name: Run deploy script on server
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /home/${{ secrets.SSH_USER }}/laravel && chmod +x deploy.sh && ./deploy.sh"

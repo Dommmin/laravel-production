@@ -31,10 +31,6 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create www-data user and group
-RUN addgroup -g 82 -S www-data \
-    && adduser -u 82 -D -S -G www-data www-data
-
 # Set working directory
 WORKDIR /var/www
 

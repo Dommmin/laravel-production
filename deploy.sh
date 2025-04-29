@@ -20,12 +20,9 @@ mkdir -p bootstrap/cache
 chown -R deployer:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-# Create .env file from GitHub secret
-echo "$ENV_FILE" > .env
+docker-compose pull
+docker-compose -d
 
-docker compose pull
-docker compose -d
-
-docker compose exec app bash -c "php artisan migrate --force"
-docker compose exec app bash -c "php artisan optimize:clear"
-docker compose exec app bash -c "php artisan optimize"
+docker-compose exec app bash -c "php artisan migrate --force"
+docker-compose exec app bash -c "php artisan optimize:clear"
+docker-compose exec app bash -c "php artisan optimize"

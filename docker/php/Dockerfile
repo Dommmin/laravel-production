@@ -16,7 +16,7 @@ FROM php:8.4-fpm-alpine
 
 # Install PHP and system dependencies
 RUN apk add --no-cache \
-    git curl libpng-dev libxml2-dev zip unzip \
+    git bash curl libpng-dev libxml2-dev zip unzip \
     freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev libzip-dev oniguruma-dev \
     postgresql-dev supervisor
 

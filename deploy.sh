@@ -17,15 +17,6 @@ mkdir -p ./docker/php
 mkdir -p ./docker/nginx/conf.d
 mkdir -p ./docker/nginx/ssl
 
-# Logowanie do GitHub Container Registry
-if [ -n "$GITHUB_PAT" ] && [ -n "$GITHUB_USER" ]; then
-  echo -e "${GREEN}Logowanie do GitHub Container Registry...${NC}"
-  echo "$GITHUB_PAT" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin
-else
-  echo -e "${YELLOW}Zmienne GITHUB_PAT lub GITHUB_USER nie są ustawione. Pomijam logowanie do rejestru.${NC}"
-  echo -e "${YELLOW}Jeśli obraz jest prywatny, logowanie może być wymagane.${NC}"
-fi
-
 # Pobieranie najnowszych obrazów
 echo -e "${GREEN}Pobieranie najnowszych obrazów...${NC}"
 docker compose pull || {

@@ -34,7 +34,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
-            type=raw,value={{branch}}
+            type=raw,value=main
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -48,6 +48,7 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,34 +56,41 @@ jobs:
       - name: Setup SSH Key
         uses: webfactory/ssh-agent@v0.9.1
         with:
-          ssh-private-key: |
-            ${{ secrets.SSH_KEY }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Create .env file
         run: |
           echo "${{ vars.ENV_FILE }}" > .env
-          echo "REGISTRY=${{ env.REGISTRY }}" >> .env
-          echo "IMAGE_NAME=${{ env.IMAGE_NAME }}" >> .env
-          # Ustaw tag na "latest" lub na nazwę gałęzi (w tym przypadku "main")
-          echo "TAG=latest" >> .env
-          echo "TAG_BRANCH=main" >> .env
-          echo "GITHUB_USER=${{ github.actor }}" >> .env
-          echo "GITHUB_PAT=${{ secrets.PAT }}" >> .env
+          {
+            echo "REGISTRY=${{ env.REGISTRY }}"
+            echo "IMAGE_NAME=${{ env.IMAGE_NAME }}"
+            echo "TAG=latest"
+            echo "TAG_BRANCH=main"
+            echo "GITHUB_USER=${{ github.actor }}"
+            echo "GITHUB_PAT=${{ secrets.PAT }}"
+          } >> .env
 
-      - name: Upload files
+      - name: Prepare remote directories
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel"
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel/docker/php"
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel/docker/nginx/conf.d"
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel/docker/nginx/ssl"
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/laravel/storage"
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            mkdir -p ~/laravel/docker/php
+            mkdir -p ~/laravel/docker/nginx/conf.d
+            mkdir -p ~/laravel/docker/nginx/ssl
+            mkdir -p ~/laravel/storage
+          EOF
 
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker-compose.yml
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/php/php.ini docker/php/www.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/php/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/nginx/conf.d/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/laravel/docker/
-
-      - name: Deploy on Server
+      - name: Upload project files
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /home/${{ secrets.SSH_USER }}/laravel && chmod +x deploy.sh && ./deploy.sh"
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/php/php.ini docker/php/www.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/php/
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/nginx/conf.d/
+          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/
+
+      - name: Deploy on server
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd ~/laravel
+            chmod +x deploy.sh
+            ./deploy.sh
+          EOF

@@ -34,6 +34,8 @@ WORKDIR /var/www
 
 # Kopiujemy projekt
 COPY --chown=www-data:www-data . .
+
+# Kopiujemy pliki build z etapu node-builder
 COPY --chown=www-data:www-data --from=node-builder /var/www/public/build public/build
 
 # Instalacja produkcyjna
@@ -45,6 +47,7 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
+# Tworzenie katalogów i ustawienie uprawnień
 RUN mkdir -p \
     storage/framework/{cache,sessions,views} \
     storage/app/public \

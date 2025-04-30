@@ -7,6 +7,7 @@ mkdir -p storage/app/public
 mkdir -p storage/framework/{sessions,views,cache}
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
+mkdir -p public/build
 
 # Ustawienie odpowiednich uprawnień
 echo "Setting proper permissions..."
@@ -17,6 +18,10 @@ sudo chmod -R 775 storage bootstrap/cache
 # Upewnij się, że katalogi framework mają odpowiednie uprawnienia
 sudo chmod -R 775 storage/framework
 sudo chown -R www-data:www-data storage/framework
+
+# Ustawienie uprawnień dla katalogu public
+sudo chown -R www-data:www-data public
+sudo chmod -R 775 public
 
 echo "Pulling new Docker images..."
 docker compose pull
@@ -34,8 +39,8 @@ docker compose exec app php artisan storage:link
 
 # Napraw uprawnienia w kontenerze
 echo "Fixing permissions in container..."
-docker compose exec app chown -R www-data:www-data /var/www/storage
-docker compose exec app chmod -R 775 /var/www/storage
+docker compose exec app chown -R www-data:www-data /var/www/storage /var/www/public
+docker compose exec app chmod -R 775 /var/www/storage /var/www/public
 docker compose exec app chmod -R 775 /var/www/storage/framework
 
 # Sprawdzenie uprawnień w kontenerze

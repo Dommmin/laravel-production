@@ -30,32 +30,46 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Prepare working dir
 WORKDIR /var/www
 
-# Create & set permissions on storage, cache & logs (host volume mounts will overlay)
-RUN mkdir -p storage/framework/{cache,sessions,views} \
-    && mkdir -p storage/app/public \
-    && mkdir -p bootstrap/cache \
-    && mkdir -p storage/logs \
-    && mkdir -p /var/log/supervisor \
-    && chown -R www-data:www-data storage bootstrap/cache storage/logs \
-    && chown -R www-data:www-data /var/log/supervisor \
-    && chmod -R 755 /var/log/supervisor \
-    && chmod -R 775 storage bootstrap/cache storage/logs
+# Create required directories with proper permissions
+RUN mkdir -p \
+    storage/framework/{cache,sessions,views} \
+    storage/app/public \
+    bootstrap/cache \
+    storage/logs \
+    /var/log/supervisor \
+    /var/run/supervisor \
+ && chown -R www-data:www-data \
+    storage \
+    bootstrap/cache \
+    storage/logs \
+    /var/log/supervisor \
+    /var/run/supervisor \
+ && chmod -R 775 \
+    storage \
+    bootstrap/cache \
+ && chmod -R 755 \
+    /var/log/supervisor \
+    /var/run/supervisor
 
 # Copy application code & Vite build output
-COPY . .
-COPY --from=node-builder /var/www/public/build public/build
+COPY --chown=www-data:www-data . .
+COPY --chown=www-data:www-data --from=node-builder /var/www/public/build public/build
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
     && chown -R www-data:www-data vendor
 
-# Copy Supervisor config
+# Copy config files
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD php-fpm-healthcheck || exit 1
+
 # Expose FPM port
 EXPOSE 9000
 
-# Launch Supervisord (starts php-fpm, Horizon, workers, etc.)
+# Launch Supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

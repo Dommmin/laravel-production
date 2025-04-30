@@ -2,15 +2,16 @@
 
 cd ~/laravel || exit 1
 
-echo "Setting proper permissions..."
-# Ustawienie odpowiednich uprawnień dla katalogów
-sudo find public -type d -exec chmod 755 {} \;
-sudo find public -type f -exec chmod 644 {} \;
-sudo chown -R $USER:$USER public
+# Tworzenie niezbędnych katalogów jeśli nie istnieją
+mkdir -p storage/app/public
+mkdir -p storage/framework/{sessions,views,cache}
+mkdir -p storage/logs
+mkdir -p bootstrap/cache
 
-# Upewnij się, że katalog build istnieje i ma odpowiednie uprawnienia
-mkdir -p public/build
-sudo chmod 755 public/build
+# Ustawienie odpowiednich uprawnień
+echo "Setting proper permissions..."
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
 
 echo "Pulling new Docker images..."
 docker compose pull
@@ -22,13 +23,13 @@ docker compose up -d
 echo "Running database migrations..."
 docker compose exec app php artisan migrate --force
 
-# Napraw uprawnienia po uruchomieniu kontenerów
-echo "Fixing permissions in containers..."
-docker compose exec nginx chown -R nginx:nginx /var/www/public
-docker compose exec app chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Tworzenie linku symbolicznego dla storage
+echo "Creating storage link..."
+docker compose exec app php artisan storage:link
 
-# Sprawdź czy pliki build są dostępne
-echo "Verifying build files..."
-docker compose exec nginx ls -la /var/www/public/build
+# Sprawdzenie uprawnień w kontenerze
+echo "Verifying permissions in containers..."
+docker compose exec app ls -la /var/www/public
+docker compose exec app ls -la /var/www/public/build
 
 echo "Deployment completed."

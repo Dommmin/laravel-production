@@ -60,7 +60,9 @@ RUN mkdir -p \
     /var/log/supervisor \
     /var/run/php \
     /var/log/php-fpm \
- && chmod -R 775 storage bootstrap/cache
+    public \
+    public/build \
+ && chmod -R 775 storage bootstrap/cache public public/build
 
 EXPOSE 9000
 

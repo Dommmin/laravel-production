@@ -27,9 +27,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - ./public:/var/www/public:ro
+      - ./public/build:/var/www/public/build:ro
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - ./public/build:/var/www/public/build
-      - ./public:/var/www/public
     depends_on:
       - app
     networks:

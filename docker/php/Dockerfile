@@ -35,7 +35,10 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     && mkdir -p storage/app/public \
     && mkdir -p bootstrap/cache \
     && mkdir -p storage/logs \
+    && mkdir -p /var/log/supervisor \
     && chown -R www-data:www-data storage bootstrap/cache storage/logs \
+    && chown -R www-data:www-data /var/log/supervisor \
+    && chmod -R 755 /var/log/supervisor \
     && chmod -R 775 storage bootstrap/cache storage/logs
 
 # Copy application code & Vite build output
@@ -48,6 +51,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 # Copy Supervisor config
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Expose FPM port
 EXPOSE 9000

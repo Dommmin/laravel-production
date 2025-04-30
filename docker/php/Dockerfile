@@ -2,19 +2,19 @@
 FROM node:22-alpine AS node-builder
 WORKDIR /var/www
 
-# Copy Node files
+# Copy package manifests and Vite config
 COPY package*.json vite.config.ts tsconfig.json ./
-# Copy source
+# Copy frontend sources
 COPY resources resources
 
-# Install and build
+# Install & build
 RUN npm ci
 RUN npm run build
 
 # Stage 2: Build PHP application
 FROM php:8.4-fpm-alpine
 
-# Install PHP and system dependencies
+# Install system dependencies & Supervisor
 RUN apk add --no-cache \
     git bash curl libpng-dev libxml2-dev zip unzip \
     freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev libzip-dev oniguruma-dev \
@@ -22,26 +22,29 @@ RUN apk add --no-cache \
 
 # Configure and install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+ && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Install Composer
+# Copy Composer binary
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Prepare directories
+# Prepare working dir
 WORKDIR /var/www
 
-RUN mkdir -p /var/log/supervisor \
-    && mkdir -p /var/run/supervisor \
-    && chown -R www-data:www-data /var/log/supervisor /var/run/supervisor
+# Create & set permissions on storage, cache & logs (host volume mounts will overlay)
+RUN mkdir -p storage/framework/{cache,sessions,views} \
+    && mkdir -p storage/app/public \
+    && mkdir -p bootstrap/cache \
+    && mkdir -p storage/logs \
+    && chown -R www-data:www-data storage bootstrap/cache storage/logs \
+    && chmod -R 775 storage bootstrap/cache storage/logs
 
-# Copy application source
+# Copy application code & Vite build output
 COPY . .
-
-# Copy built assets from node-builder (Vite default output folder: public/build)
 COPY --from=node-builder /var/www/public/build public/build
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
+    && chown -R www-data:www-data vendor
 
 # Copy Supervisor config
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
@@ -49,5 +52,5 @@ COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 # Expose FPM port
 EXPOSE 9000
 
-# Start supervisord
+# Launch Supervisord (starts php-fpm, Horizon, workers, etc.)
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

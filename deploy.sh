@@ -8,6 +8,10 @@ sudo find public -type d -exec chmod 755 {} \;
 sudo find public -type f -exec chmod 644 {} \;
 sudo chown -R $USER:$USER public
 
+# Upewnij się, że katalog build istnieje i ma odpowiednie uprawnienia
+mkdir -p public/build
+sudo chmod 755 public/build
+
 echo "Pulling new Docker images..."
 docker compose pull
 
@@ -22,5 +26,9 @@ docker compose exec app php artisan migrate --force
 echo "Fixing permissions in containers..."
 docker compose exec nginx chown -R nginx:nginx /var/www/public
 docker compose exec app chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+# Sprawdź czy pliki build są dostępne
+echo "Verifying build files..."
+docker compose exec nginx ls -la /var/www/public/build
 
 echo "Deployment completed."

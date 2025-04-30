@@ -10,7 +10,8 @@ env:
   IMAGE_NAME: dommmin/laravel-production
 
 jobs:
-  build-and-push:
+  build:
+    name: 🏗️ Build and Push Docker Images
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -46,9 +47,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy:
-    needs: build-and-push
+    name: 🚀 Deploy to Server
+    needs: build
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -72,7 +73,6 @@ jobs:
             echo "TAG=latest"
             echo "TAG_BRANCH=main"
             echo "GITHUB_USER=${{ github.actor }}"
-            echo "GITHUB_PAT=${{ secrets.PAT }}"
           } >> .env
 
       - name: Prepare remote directories

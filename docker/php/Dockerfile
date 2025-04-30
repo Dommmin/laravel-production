@@ -36,7 +36,7 @@ WORKDIR /var/www
 COPY --chown=www-data:www-data . .
 
 # Kopiujemy pliki build z etapu node-builder
-COPY --chown=www-data:www-data --from=node-builder /var/www/public/build public/build
+COPY --chown=www-data:www-data --from=node-builder /var/www/public/build /var/www/public/build
 
 # Instalacja produkcyjna
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
@@ -66,6 +66,9 @@ RUN mkdir -p \
     public \
     public/build \
  && chmod -R 775 storage bootstrap/cache public public/build
+
+# Weryfikacja plików build
+RUN ls -la /var/www/public/build
 
 EXPOSE 9000
 

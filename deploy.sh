@@ -43,10 +43,15 @@ docker compose exec app chown -R www-data:www-data /var/www/storage /var/www/pub
 docker compose exec app chmod -R 775 /var/www/storage /var/www/public
 docker compose exec app chmod -R 775 /var/www/storage/framework
 
-# Sprawdzenie uprawnień w kontenerze
-echo "Verifying permissions in containers..."
+# Sprawdzenie uprawnień i plików w kontenerze
+echo "Verifying permissions and files in containers..."
+echo "=== Storage Framework ==="
 docker compose exec app ls -la /var/www/storage/framework
+echo "=== Public Directory ==="
 docker compose exec app ls -la /var/www/public
+echo "=== Build Directory ==="
 docker compose exec app ls -la /var/www/public/build
+echo "=== Build Assets ==="
+docker compose exec app ls -la /var/www/public/build/assets
 
 echo "Deployment completed."

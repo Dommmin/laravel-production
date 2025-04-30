@@ -58,6 +58,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Setup known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: Create .env file
         run: |
           echo "${{ vars.ENV_FILE }}" > .env
@@ -72,7 +77,7 @@ jobs:
 
       - name: Prepare remote directories
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             mkdir -p ~/laravel/docker/php
             mkdir -p ~/laravel/docker/nginx/conf.d
             mkdir -p ~/laravel/docker/nginx/ssl
@@ -81,15 +86,15 @@ jobs:
 
       - name: Upload project files
         run: |
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/php/php.ini docker/php/www.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/php/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/nginx/conf.d/
-          scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/
+          scp -P ${{ secrets.SSH_PORT }} docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
+          scp -P ${{ secrets.SSH_PORT }} .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/
+          scp -P ${{ secrets.SSH_PORT }} docker/php/php.ini docker/php/www.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/php/
+          scp -P ${{ secrets.SSH_PORT }} docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/nginx/conf.d/
+          scp -P ${{ secrets.SSH_PORT }} docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/
 
       - name: Deploy on server
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd ~/laravel
             chmod +x deploy.sh
             ./deploy.sh

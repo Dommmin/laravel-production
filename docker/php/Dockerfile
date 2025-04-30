@@ -8,29 +8,25 @@ COPY resources resources
 RUN npm ci
 RUN npm run build
 
-# Zmiana z alpine na standardowy obraz
-FROM php:8.4-fpm
+FROM php:8.4-fpm-alpine
 
-# Instalacja pakietów
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libwebp-dev \
-    zlib1g-dev \
-    libzip-dev \
-    libonig-dev \
-    libpq-dev \
-    supervisor \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    git bash curl libpng-dev libxml2-dev zip unzip \
+    freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev libzip-dev oniguruma-dev \
+    postgresql-dev supervisor
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+
+RUN addgroup -g 1000 appuser && \
+    adduser -D -u 1000 -G appuser appuser
+
+# Zmień właściciela plików
+RUN chown -R appuser:appuser /var/www
+
+# Zmień konfigurację PHP-FPM
+RUN sed -i 's/user = www-data/user = appuser/g' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/group = www-data/group = appuser/g' /usr/local/etc/php-fpm.d/www.conf
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -45,26 +41,27 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
  && chown -R www-data:www-data vendor
 
 # Kopiowanie konfiguracji Supervisor i PHP
-COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
-# Tworzenie katalogów
 RUN mkdir -p \
-    /var/www/storage/framework/{cache,sessions,views} \
-    /var/www/storage/app/public \
-    /var/www/bootstrap/cache \
-    /var/www/storage/logs \
+    storage/framework/{cache,sessions,views} \
+    storage/app/public \
+    bootstrap/cache \
+    storage/logs \
     /var/log/supervisor \
     /var/run/php \
+    /var/log/php-fpm \
  && chown -R www-data:www-data \
-    /var/www/storage \
-    /var/www/bootstrap/cache \
-    /var/www/storage/logs \
+    storage \
+    bootstrap/cache \
+    storage/logs \
     /var/log/supervisor \
     /var/run/php \
- && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+    /var/log/php-fpm \
+ && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 9000
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]

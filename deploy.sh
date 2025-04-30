@@ -10,8 +10,13 @@ mkdir -p bootstrap/cache
 
 # Ustawienie odpowiednich uprawnień
 echo "Setting proper permissions..."
+# Ustawienie właściciela i uprawnień dla storage i cache
 sudo chown -R www-data:www-data storage bootstrap/cache
 sudo chmod -R 775 storage bootstrap/cache
+
+# Upewnij się, że katalogi framework mają odpowiednie uprawnienia
+sudo chmod -R 775 storage/framework
+sudo chown -R www-data:www-data storage/framework
 
 echo "Pulling new Docker images..."
 docker compose pull
@@ -27,8 +32,15 @@ docker compose exec app php artisan migrate --force
 echo "Creating storage link..."
 docker compose exec app php artisan storage:link
 
+# Napraw uprawnienia w kontenerze
+echo "Fixing permissions in container..."
+docker compose exec app chown -R www-data:www-data /var/www/storage
+docker compose exec app chmod -R 775 /var/www/storage
+docker compose exec app chmod -R 775 /var/www/storage/framework
+
 # Sprawdzenie uprawnień w kontenerze
 echo "Verifying permissions in containers..."
+docker compose exec app ls -la /var/www/storage/framework
 docker compose exec app ls -la /var/www/public
 docker compose exec app ls -la /var/www/public/build
 

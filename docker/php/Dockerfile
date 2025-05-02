@@ -70,6 +70,9 @@ RUN mkdir -p \
 # Weryfikacja plików build
 RUN ls -la /var/www/public/build
 
+# Skopiuj pliki public do wolumenu
+VOLUME ["/var/www/public"]
+
 EXPOSE 9000
 
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]

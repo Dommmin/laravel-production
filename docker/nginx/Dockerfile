@@ -12,7 +12,7 @@ RUN mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
     chmod -R 755 /var/cache/nginx /var/run /var/log/nginx
 
 # Copy custom configuration
-COPY conf.d/default.conf /etc/nginx/conf.d/
+COPY docker/nginx/conf.d/default.conf /etc/nginx/conf.d/
 
 # Set proper permissions for nginx user
 RUN chown -R nginx:nginx /var/www && \

@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile
+    image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_app
     restart: unless-stopped
     working_dir: /var/www
@@ -18,9 +16,7 @@ services:
       - redis
 
   nginx:
-    build:
-      context: .
-      dockerfile: docker/nginx/Dockerfile
+    image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_nginx
     restart: unless-stopped
     ports:

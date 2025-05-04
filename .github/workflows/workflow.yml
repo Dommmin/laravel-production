@@ -7,7 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: dommmin/laravel-production
+  PHP_IMAGE_NAME: dommmin/laravel-production-php
+  NGINX_IMAGE_NAME: dommmin/laravel-production-nginx
 
 jobs:
   build:
@@ -28,23 +29,41 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      - name: Extract metadata for PHP image
+        id: meta-php
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.PHP_IMAGE_NAME }}
           tags: |
             type=raw,value=latest
             type=raw,value=main
 
-      - name: Build and push Docker image
+      - name: Extract metadata for Nginx image
+        id: meta-nginx
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=main
+
+      - name: Build and push PHP image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: docker/php/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-php.outputs.tags }}
+          labels: ${{ steps.meta-php.outputs.labels }}
+
+      - name: Build and push Nginx image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/nginx/Dockerfile
+          push: true
+          tags: ${{ steps.meta-nginx.outputs.tags }}
+          labels: ${{ steps.meta-nginx.outputs.labels }}
 
   deploy:
     name: 🚀 Deploy to Server
@@ -69,7 +88,8 @@ jobs:
           echo "${{ vars.ENV_FILE }}" > .env
           {
             echo "REGISTRY=${{ env.REGISTRY }}"
-            echo "IMAGE_NAME=${{ env.IMAGE_NAME }}"
+            echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
+            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
             echo "TAG=latest"
             echo "TAG_BRANCH=main"
             echo "GITHUB_USER=${{ github.actor }}"

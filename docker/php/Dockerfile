@@ -10,9 +10,6 @@ RUN npm run build
 
 FROM php:8.4-fpm-alpine
 
-ARG BUILD_DATE
-ARG COMMIT_SHA
-
 RUN apk add --no-cache \
     git bash curl libpng-dev libxml2-dev zip unzip \
     freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev libzip-dev oniguruma-dev \
@@ -70,10 +67,6 @@ RUN chown -R appuser:appuser \
     public \
     public/build \
  && chmod -R 775 storage bootstrap/cache public public/build
-
-# Add build metadata
-RUN echo "Build date: ${BUILD_DATE}" > /var/www/build-info.txt && \
-    echo "Commit SHA: ${COMMIT_SHA}" >> /var/www/build-info.txt
 
 # Switch to non-root user
 USER appuser

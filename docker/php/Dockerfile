@@ -1,6 +1,6 @@
 FROM node:22-alpine AS node-builder
 
-WORKDIR /var/www/html
+WORKDIR /var/www
 
 COPY package*.json vite.config.ts tsconfig.json ./
 COPY resources resources
@@ -9,6 +9,9 @@ RUN npm ci
 RUN npm run build
 
 FROM php:8.4-fpm-alpine
+
+ARG BUILD_DATE
+ARG COMMIT_SHA
 
 RUN apk add --no-cache \
     git bash curl libpng-dev libxml2-dev zip unzip \
@@ -28,13 +31,13 @@ RUN sed -i 's/user = www-data/user = appuser/g' /usr/local/etc/php-fpm.d/www.con
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+WORKDIR /var/www
 
 # Copy project files
 COPY --chown=appuser:appuser . .
 
 # Copy build files from node-builder
-COPY --chown=appuser:appuser --from=node-builder /var/www/html/public/build /var/www/html/public/build
+COPY --chown=appuser:appuser --from=node-builder /var/www/public/build /var/www/public/build
 
 # Install production dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
@@ -67,6 +70,10 @@ RUN chown -R appuser:appuser \
     public \
     public/build \
  && chmod -R 775 storage bootstrap/cache public public/build
+
+# Add build metadata
+RUN echo "Build date: ${BUILD_DATE}" > /var/www/build-info.txt && \
+    echo "Commit SHA: ${COMMIT_SHA}" >> /var/www/build-info.txt
 
 # Switch to non-root user
 USER appuser

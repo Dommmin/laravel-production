@@ -16,10 +16,10 @@ docker compose up -d
 
 # Run Laravel commands
 echo "⚡ Running Laravel commands..."
-php artisan optimize:clear
-php artisan optimize
-php artisan storage:link
-php artisan migrate --force
+docker compose exec -T app php artisan optimize:clear
+docker compose exec -T app php artisan optimize
+docker compose exec -T app php artisan storage:link
+docker compose exec -T app php artisan migrate --force
 
 # Clean up old releases
 echo "🧹 Cleaning up old releases..."

@@ -7,9 +7,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 RUN mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
     chmod -R 755 /var/cache/nginx /var/run /var/log/nginx
 
-# Copy custom configuration
-COPY docker/nginx/conf.d/default.conf /etc/nginx/conf.d/
-
 # Create nginx user if it doesn't exist
 RUN adduser -D -H -u 101 -s /sbin/nologin nginx || true
 
@@ -21,6 +18,10 @@ RUN chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx /etc/nginx && 
 RUN mkdir -p /run && \
     chown -R nginx:nginx /run && \
     chmod -R 755 /run
+
+# Copy configuration files
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx/conf.d/default.conf /etc/nginx/conf.d/
 
 # Switch to non-root user
 USER nginx

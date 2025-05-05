@@ -18,13 +18,11 @@ RUN apk add --no-cache \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
+# Create appuser
 RUN addgroup -g 1000 appuser && \
     adduser -D -u 1000 -G appuser appuser
 
-# Zmień właściciela plików
-RUN chown -R appuser:appuser /var/www
-
-# Zmień konfigurację PHP-FPM
+# Configure PHP-FPM
 RUN sed -i 's/user = www-data/user = appuser/g' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's/group = www-data/group = appuser/g' /usr/local/etc/php-fpm.d/www.conf
 
@@ -32,22 +30,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Kopiujemy projekt
-COPY --chown=www-data:www-data . .
+# Copy project files
+COPY --chown=appuser:appuser . .
 
-# Kopiujemy pliki build z etapu node-builder
-COPY --chown=www-data:www-data --from=node-builder /var/www/public/build /var/www/public/build
+# Copy build files from node-builder
+COPY --chown=appuser:appuser --from=node-builder /var/www/public/build /var/www/public/build
 
-# Instalacja produkcyjna
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
- && chown -R www-data:www-data vendor
+# Install production dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Kopiowanie konfiguracji Supervisor i PHP
-COPY docker/supervisord.conf /etc/supervisord.conf
-COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
-COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
+# Copy configuration files
+COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
+COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY --chown=appuser:appuser docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
-# Tworzenie katalogów i ustawienie uprawnień
+# Create required directories
 RUN mkdir -p \
     storage/framework/{cache,sessions,views} \
     storage/app/public \
@@ -55,8 +52,10 @@ RUN mkdir -p \
     storage/logs \
     /var/log/supervisor \
     /var/run/php \
-    /var/log/php-fpm \
- && chown -R www-data:www-data \
+    /var/log/php-fpm
+
+# Set permissions
+RUN chown -R appuser:appuser \
     storage \
     bootstrap/cache \
     storage/logs \
@@ -67,11 +66,8 @@ RUN mkdir -p \
     public/build \
  && chmod -R 775 storage bootstrap/cache public public/build
 
-# Weryfikacja plików build
-RUN ls -la /var/www/public/build
-
-# Skopiuj pliki public do wolumenu
-VOLUME ["/var/www/public"]
+# Switch to non-root user
+USER appuser
 
 EXPOSE 9000
 

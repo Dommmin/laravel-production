@@ -7,13 +7,14 @@ services:
     restart: unless-stopped
     working_dir: /var/www
     volumes:
-      - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./:/var/www:delegated
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro
     networks:
       - laravel_network
     depends_on:
       - db
       - redis
+    user: "1000:1000"
 
   nginx:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
@@ -22,8 +23,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./:/var/www
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./:/var/www:delegated
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
     networks:
       - laravel_network
     depends_on:

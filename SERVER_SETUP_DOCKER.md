@@ -70,6 +70,12 @@ sudo chmod -R 775 /home/deployer/laravel/public
 sudo apt install -y acl
 sudo setfacl -Rdm g:www-data:rwx /home/deployer/laravel
 sudo setfacl -Rdm g:deployer:rwx /home/deployer/laravel
+
+# Create docker directory
+sudo mkdir -p /home/deployer/laravel/docker/nginx/conf.d
+sudo mkdir -p /home/deployer/laravel/docker/php
+sudo chown -R deployer:www-data /home/deployer/laravel/docker
+sudo chmod -R 775 /home/deployer/laravel/docker
 ```
 
 ## 3. Configure Docker Permissions
@@ -117,16 +123,7 @@ Add the following secrets to your GitHub repository:
 Add variable for .env production file:
 - `ENV_FILE`: The contents of your .env file
 
-## 6. Configure Docker Compose Permissions
-
-```bash
-# Create docker-compose.yml directory
-sudo mkdir -p /home/deployer/laravel/docker
-sudo chown -R deployer:www-data /home/deployer/laravel/docker
-sudo chmod -R 775 /home/deployer/laravel/docker
-```
-
-## 7. Final Steps
+## 6. Final Steps
 
 1. Log out and log back in to apply group changes:
 ```bash

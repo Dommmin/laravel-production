@@ -98,19 +98,14 @@ jobs:
       - name: Prepare remote directories
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            mkdir -p ~/laravel/docker/php
             mkdir -p ~/laravel/docker/nginx/conf.d
-            mkdir -p ~/laravel/docker/nginx/ssl
-            mkdir -p ~/laravel/storage
           EOF
 
-      - name: Upload project files
+      - name: Upload configuration files
         run: |
           scp -P ${{ secrets.SSH_PORT }} docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
           scp -P ${{ secrets.SSH_PORT }} .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/
-          scp -P ${{ secrets.SSH_PORT }} docker/php/php.ini docker/php/www.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/php/
           scp -P ${{ secrets.SSH_PORT }} docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/nginx/conf.d/
-          scp -P ${{ secrets.SSH_PORT }} docker/supervisord.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/
 
       - name: Deploy on server
         run: |

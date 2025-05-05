@@ -1,9 +1,15 @@
+version: '3.8'
+
 services:
   app:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_app
     restart: unless-stopped
     working_dir: /var/www
+    volumes:
+      - .env:/var/www/.env
+      - laravel_storage:/var/www/storage
+      - laravel_bootstrap:/var/www/bootstrap
     networks:
       - laravel_network
     depends_on:
@@ -19,6 +25,8 @@ services:
       - "80:80"
     volumes:
       - laravel_app:/var/www:ro
+      - laravel_storage:/var/www/storage:ro
+      - laravel_bootstrap:/var/www/bootstrap:ro
     networks:
       - laravel_network
     depends_on:
@@ -59,4 +67,8 @@ volumes:
   dbdata:
     driver: local
   laravel_app:
+    driver: local
+  laravel_storage:
+    driver: local
+  laravel_bootstrap:
     driver: local

@@ -50,30 +50,8 @@ sudo mkdir -p /home/deployer/laravel
 sudo chown -R deployer:www-data /home/deployer/laravel
 sudo chmod -R 2775 /home/deployer/laravel
 
-# Create required directories
-sudo mkdir -p /home/deployer/laravel/storage/{app,framework,logs}
-sudo mkdir -p /home/deployer/laravel/storage/framework/{cache,sessions,views}
-sudo mkdir -p /home/deployer/laravel/bootstrap/cache
-sudo mkdir -p /home/deployer/laravel/public/build
-
-# Set proper permissions
-sudo chown -R deployer:www-data /home/deployer/laravel/storage
-sudo chown -R deployer:www-data /home/deployer/laravel/bootstrap/cache
-sudo chown -R deployer:www-data /home/deployer/laravel/public
-
-# Set directory permissions
-sudo chmod -R 775 /home/deployer/laravel/storage
-sudo chmod -R 775 /home/deployer/laravel/bootstrap/cache
-sudo chmod -R 775 /home/deployer/laravel/public
-
-# Set ACL for future files
-sudo apt install -y acl
-sudo setfacl -Rdm g:www-data:rwx /home/deployer/laravel
-sudo setfacl -Rdm g:deployer:rwx /home/deployer/laravel
-
-# Create docker directory
+# Create directory for Nginx configuration
 sudo mkdir -p /home/deployer/laravel/docker/nginx/conf.d
-sudo mkdir -p /home/deployer/laravel/docker/php
 sudo chown -R deployer:www-data /home/deployer/laravel/docker
 sudo chmod -R 775 /home/deployer/laravel/docker
 ```
@@ -86,8 +64,9 @@ docker network create laravel_network
 
 # Create Docker volumes
 docker volume create laravel_storage
-docker volume create laravel_bootstrap_cache
-docker volume create laravel_public
+docker volume create laravel_bootstrap
+docker volume create laravel_app
+docker volume create dbdata
 ```
 
 ## 4. Set Up SSH Key for GitHub Actions

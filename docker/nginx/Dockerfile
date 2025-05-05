@@ -17,6 +17,11 @@ RUN adduser -D -H -u 101 -s /sbin/nologin nginx || true
 RUN chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx /etc/nginx && \
     chmod -R 755 /var/cache/nginx /var/run /var/log/nginx /etc/nginx
 
+# Create pid directory with proper permissions
+RUN mkdir -p /run && \
+    chown -R nginx:nginx /run && \
+    chmod -R 755 /run
+
 # Switch to non-root user
 USER nginx
 

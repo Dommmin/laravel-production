@@ -15,6 +15,9 @@ docker compose down
 docker compose up -d
 
 # Run Laravel commands
+echo "🧹 Clearing caches..."
+docker compose exec -T app php artisan optimize:clear
+
 echo "⚡ Running Laravel commands..."
 docker compose exec -T app php artisan config:cache
 docker compose exec -T app php artisan route:cache

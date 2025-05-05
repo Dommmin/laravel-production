@@ -8,6 +8,7 @@ services:
     working_dir: /var/www
     volumes:
       - .env:/var/www/.env
+      - ./public:/var/www/public
       - laravel_storage:/var/www/storage
       - laravel_bootstrap:/var/www/bootstrap
     networks:
@@ -24,7 +25,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - laravel_app:/var/www:ro
+      - ./public:/var/www/public:ro
+      - ./storage/app/public:/var/www/storage/app/public:ro
     networks:
       - laravel_network
     depends_on:
@@ -63,8 +65,6 @@ networks:
 
 volumes:
   dbdata:
-    driver: local
-  laravel_app:
     driver: local
   laravel_storage:
     driver: local

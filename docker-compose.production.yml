@@ -4,10 +4,10 @@ services:
     container_name: laravel_app
     restart: unless-stopped
     working_dir: /var/www
+    env_file: .env
     volumes:
-      - .env:/var/www/.env
       - laravel_storage:/var/www/storage
-      - laravel_public_storage:/var/www/public/storage
+      - laravel_public:/var/www/public
     networks:
         - laravel_network
     depends_on:
@@ -20,7 +20,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - laravel_public_storage:/var/www/public/storage
+      - laravel_storage:/var/www/storage:ro
+      - laravel_public:/var/www/public:ro
     networks:
       - laravel_network
     depends_on:
@@ -41,5 +42,5 @@ networks:
 
 volumes:
   laravel_storage:
-  laravel_public_storage:
+  laravel_public:
   redis_data:

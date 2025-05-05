@@ -46,7 +46,9 @@ COPY --chown=appuser:appuser docker/php/www.conf /usr/local/etc/php-fpm.d/www.co
 
 # Create required directories
 RUN mkdir -p \
-    storage/framework/{cache,sessions,views} \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
     storage/app/public \
     bootstrap/cache \
     storage/logs \

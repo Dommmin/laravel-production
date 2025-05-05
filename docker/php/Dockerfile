@@ -50,6 +50,7 @@ RUN mkdir -p \
     storage/framework/sessions \
     storage/framework/views \
     storage/app/public \
+    public/storage \
     bootstrap/cache \
     storage/logs \
     /var/log/supervisor \

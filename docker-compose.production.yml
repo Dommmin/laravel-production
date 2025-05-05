@@ -23,8 +23,6 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-    volumes:
-      - laravel_app:/var/www:ro
     networks:
       - laravel_network
     depends_on:

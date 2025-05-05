@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   PHP_IMAGE_NAME: dommmin/laravel-production-php
-  NGINX_IMAGE_NAME: dommmin/laravel-production-nginx
+#  NGINX_IMAGE_NAME: dommmin/laravel-production-nginx
 
 jobs:
   build:
@@ -38,14 +38,14 @@ jobs:
             type=raw,value=latest
             type=raw,value=main
 
-      - name: Extract metadata for Nginx image
-        id: meta-nginx
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            type=raw,value=main
+#      - name: Extract metadata for Nginx image
+#        id: meta-nginx
+#        uses: docker/metadata-action@v5
+#        with:
+#          images: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
+#          tags: |
+#            type=raw,value=latest
+#            type=raw,value=main
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5
@@ -89,7 +89,7 @@ jobs:
           {
             echo "REGISTRY=${{ env.REGISTRY }}"
             echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
-            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
+#            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
             echo "TAG=latest"
             echo "TAG_BRANCH=main"
             echo "GITHUB_USER=${{ github.actor }}"

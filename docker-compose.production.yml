@@ -6,21 +6,19 @@ services:
     working_dir: /var/www
     volumes:
       - .env:/var/www/.env
-      - laravel_app:/var/www
     networks:
       - laravel_network
     depends_on:
       - redis
 
   nginx:
-    image: nginx:stable-alpine
+    image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_nginx
     restart: unless-stopped
     ports:
       - "80:80"
     volumes:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
-      - laravel_app:/var/www
     networks:
       - laravel_network
     depends_on:
@@ -38,6 +36,3 @@ services:
 networks:
   laravel_network:
     driver: bridge
-
-volumes:
-  laravel_app:

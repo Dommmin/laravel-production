@@ -8,7 +8,7 @@ COPY resources resources
 RUN npm ci
 RUN npm run build
 
-FROM php:8.4-fpm-alpine
+FROM php:8.4-fpm-alpine AS php-stage
 
 RUN apk add --no-cache \
     git bash curl libpng-dev libxml2-dev zip unzip \

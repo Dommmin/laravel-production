@@ -10,10 +10,12 @@ RUN npm run build
 
 FROM nginx:stable-alpine
 
-# Copy static files from node-builder
-COPY --from=node-builder /var/www/public/build /var/www/public/build
+# Copy the entire public directory
+COPY --from=node-builder /var/www/public /var/www/public
 
 # Copy Nginx configuration
 COPY docker/nginx/conf.d /etc/nginx/conf.d
 
 EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

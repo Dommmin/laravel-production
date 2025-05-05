@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FileController;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,10 @@ Route::get('/test-mail', function () {
 
     return 'Mail sent';
 });
+
+Route::resource('/files', FileController::class)
+    ->only(['index', 'store', 'destroy'])
+    ->middleware('auth');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

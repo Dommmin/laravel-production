@@ -8,7 +8,7 @@ services:
     working_dir: /var/www
     volumes:
       - .env:/var/www/.env
-      - ./public:/var/www/public
+      # Nie montujemy public - zostawiamy pliki build w kontenerze
       - laravel_storage:/var/www/storage
       - laravel_bootstrap:/var/www/bootstrap
     networks:
@@ -25,8 +25,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./public:/var/www/public:ro
-      - ./storage/app/public:/var/www/storage/app/public:ro
+      # Używamy volume kontenera app dla serwowania plików
+      - laravel_app_public:/var/www/public:ro
     networks:
       - laravel_network
     depends_on:
@@ -69,4 +69,7 @@ volumes:
   laravel_storage:
     driver: local
   laravel_bootstrap:
+    driver: local
+  # Dodajemy nowy volume dla plików public
+  laravel_app_public:
     driver: local

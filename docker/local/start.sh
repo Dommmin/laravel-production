@@ -1,23 +1,16 @@
 #!/bin/bash
-set -e
+set -eo pipefail
 
-# Ustaw prawidłowe uprawnienia dla katalogów aplikacji
-echo "Setting correct permissions..."
-sudo chown -R www-data:www-data /var/www
-sudo chmod -R 775 /var/www
-
-echo "Starting PHP-FPM..."
-php-fpm &
-
-if [ ! -d "node_modules" ]; then
-  echo "Installing Node dependencies..."
-  npm install
+# Ustawienie prawidłowego ownera dla storage
+if [ "$(id -u)" = "0" ]; then
+    chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 fi
 
-echo "Starting Vite..."
-npm run dev &
+# Instalacja zależności Node jeśli brak
+if [ ! -d "node_modules" ] && [ -f "package.json" ]; then
+    echo "Installing Node dependencies..."
+    npm install
+fi
 
 echo "Starting Supervisor..."
-/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
-
-wait -n
+exec /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf

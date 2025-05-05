@@ -9,7 +9,6 @@
 /vendor
 .env
 .env.backup
-.env.production
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
@@ -33,3 +32,5 @@ docker/nginx/log/
 supervisord.log
 
 supervisord.pid
+
+docker/local/nginx/log/

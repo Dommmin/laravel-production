@@ -4,3 +4,8 @@ node_modules
 tests
 vendor
 storage
+deploy.sh
+docker-compose.production.yml
+docker-compose.yml
+Makefile
+docker

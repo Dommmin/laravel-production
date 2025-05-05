@@ -3,10 +3,10 @@ services:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_app
     restart: unless-stopped
-    working_dir: /var/www
+    working_dir: /var/www/html
     volumes:
-      - .env:/var/www/.env
-      - laravel_app:/var/www
+      - .env:/var/www/html/.env
+      - laravel_app:/var/www/html
     networks:
       - laravel_network
     depends_on:
@@ -18,9 +18,10 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
-      - laravel_app:/var/www
+      - laravel_app:/var/www/html
     networks:
       - laravel_network
     depends_on:

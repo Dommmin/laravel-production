@@ -11,10 +11,7 @@ RUN npm run build
 
 FROM nginx:stable-alpine
 
-# Upewnij się, że katalog /var/www/public istnieje i zawiera build
 COPY --from=node-builder /var/www/public /var/www/public
-
-# Skopiuj konfigurację Nginxa
 COPY docker/nginx/conf.d /etc/nginx/conf.d
 
 EXPOSE 80

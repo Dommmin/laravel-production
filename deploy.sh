@@ -19,15 +19,44 @@ find_available_port() {
     echo $port
 }
 
+# Get current port if running (without jq)
+get_current_port() {
+    if command -v jq &> /dev/null; then
+        docker compose ps nginx --format json | jq -r '.[0].Ports' | grep -oP '\d+(?=->80/tcp)' || echo "80"
+    else
+        docker compose ps nginx | grep -oP '\d+(?=->80/tcp)' || echo "80"
+    fi
+}
+
 # Get current port if running
-CURRENT_PORT=$(docker compose ps nginx --format json | jq -r '.[0].Ports' | grep -oP '\d+(?=->80/tcp)' || echo "80")
+CURRENT_PORT=$(get_current_port)
 NEW_PORT=$(find_available_port)
 
 echo "📊 Current port: $CURRENT_PORT, New port: $NEW_PORT"
 
-# Pull the latest images
+# Pull the latest images with retries
 echo "📥 Pulling latest Docker images..."
-docker compose pull
+MAX_RETRIES=3
+RETRY_DELAY=10
+
+for service in app nginx redis; do
+    retry_count=0
+    while [ $retry_count -lt $MAX_RETRIES ]; do
+        echo "Pulling $service image (attempt $((retry_count + 1))/$MAX_RETRIES)..."
+        if docker compose pull $service; then
+            echo "✅ Successfully pulled $service image"
+            break
+        fi
+        retry_count=$((retry_count + 1))
+        if [ $retry_count -lt $MAX_RETRIES ]; then
+            echo "❌ Failed to pull $service image, retrying in $RETRY_DELAY seconds..."
+            sleep $RETRY_DELAY
+        else
+            echo "❌ Failed to pull $service image after $MAX_RETRIES attempts"
+            exit 1
+        fi
+    done
+done
 
 # Create new containers with unique names and new port
 echo "🏗️ Creating new containers..."
@@ -55,8 +84,16 @@ if [ $ELAPSED -ge $TIMEOUT ]; then
     exit 1
 fi
 
-# Get the old project name
-OLD_PROJECT=$(docker compose ls --format json | jq -r '.[0].name' | grep -v "laravel_${DEPLOYMENT_ID}" || true)
+# Get the old project name (without jq)
+get_old_project() {
+    if command -v jq &> /dev/null; then
+        docker compose ls --format json | jq -r '.[0].name' | grep -v "laravel_${DEPLOYMENT_ID}" || true
+    else
+        docker compose ls | grep -v "laravel_${DEPLOYMENT_ID}" | head -n 1 | awk '{print $1}' || true
+    fi
+}
+
+OLD_PROJECT=$(get_old_project)
 
 if [ ! -z "$OLD_PROJECT" ]; then
     echo "🔄 Switching traffic to new containers..."

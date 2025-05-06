@@ -10,13 +10,28 @@ source .env
 DEPLOYMENT_ID=${DEPLOYMENT_ID:-$(date +%s)}
 echo "🚀 Starting deployment $DEPLOYMENT_ID"
 
+# Find an available port
+find_available_port() {
+    local port=8080
+    while netstat -tuln | grep -q ":$port "; do
+        port=$((port + 1))
+    done
+    echo $port
+}
+
+# Get current port if running
+CURRENT_PORT=$(docker compose ps nginx --format json | jq -r '.[0].Ports' | grep -oP '\d+(?=->80/tcp)' || echo "80")
+NEW_PORT=$(find_available_port)
+
+echo "📊 Current port: $CURRENT_PORT, New port: $NEW_PORT"
+
 # Pull the latest images
 echo "📥 Pulling latest Docker images..."
 docker compose pull
 
-# Create new containers with unique names
+# Create new containers with unique names and new port
 echo "🏗️ Creating new containers..."
-docker compose -p laravel_${DEPLOYMENT_ID} up -d --no-deps --scale app=2
+NGINX_PORT=$NEW_PORT docker compose -p laravel_${DEPLOYMENT_ID} up -d --no-deps --scale app=2
 
 # Wait for new containers to be healthy
 echo "⏳ Waiting for new containers to be healthy..."
@@ -43,7 +58,7 @@ fi
 # Remove the deployment ID from the project name for the final state
 echo "✨ Finalizing deployment..."
 docker compose -p laravel_${DEPLOYMENT_ID} down
-docker compose up -d
+NGINX_PORT=80 docker compose up -d
 
 # Run Laravel commands
 echo "⚡ Running Laravel commands..."

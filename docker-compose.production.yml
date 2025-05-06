@@ -22,7 +22,7 @@ services:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "${NGINX_PORT:-80}:80"
     volumes:
       - laravel_storage:/var/www/storage:ro
       - laravel_public:/var/www/public:ro

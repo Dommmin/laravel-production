@@ -33,13 +33,24 @@ docker compose pull
 echo "🏗️ Creating new containers..."
 NGINX_PORT=$NEW_PORT docker compose -p laravel_${DEPLOYMENT_ID} up -d --no-deps --scale app=2
 
-# Wait for new containers to be healthy
+# Wait for new containers to be healthy with timeout
 echo "⏳ Waiting for new containers to be healthy..."
-sleep 10
+TIMEOUT=60
+ELAPSED=0
+while [ $ELAPSED -lt $TIMEOUT ]; do
+    if docker compose -p laravel_${DEPLOYMENT_ID} ps | grep -q "healthy"; then
+        echo "✅ All containers are healthy!"
+        break
+    fi
+    echo "⏳ Still waiting for containers to be healthy... ($ELAPSED/$TIMEOUT seconds)"
+    sleep 5
+    ELAPSED=$((ELAPSED + 5))
+done
 
-# Check if new containers are running properly
-if ! docker compose -p laravel_${DEPLOYMENT_ID} ps | grep -q "Up"; then
-    echo "❌ New containers failed to start properly"
+if [ $ELAPSED -ge $TIMEOUT ]; then
+    echo "❌ Timeout waiting for containers to be healthy"
+    docker compose -p laravel_${DEPLOYMENT_ID} ps
+    docker compose -p laravel_${DEPLOYMENT_ID} logs
     docker compose -p laravel_${DEPLOYMENT_ID} down
     exit 1
 fi

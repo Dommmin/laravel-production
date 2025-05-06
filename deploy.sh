@@ -16,7 +16,7 @@ docker compose pull
 
 # Create new containers with unique names
 echo "🏗️ Creating new containers..."
-docker compose -p laravel_${DEPLOYMENT_ID} up -d --no-deps --scale app=2 --no-recreate
+docker compose -p laravel_${DEPLOYMENT_ID} up -d --no-deps --scale app=2
 
 # Wait for new containers to be healthy
 echo "⏳ Waiting for new containers to be healthy..."

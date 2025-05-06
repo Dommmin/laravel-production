@@ -1,7 +1,6 @@
 services:
   app:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
-    container_name: laravel_app_${DEPLOYMENT_ID:-latest}
     restart: unless-stopped
     working_dir: /var/www
     env_file: .env
@@ -21,7 +20,6 @@ services:
 
   nginx:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
-    container_name: laravel_nginx_${DEPLOYMENT_ID:-latest}
     restart: unless-stopped
     ports:
       - "80:80"
@@ -40,7 +38,6 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: laravel_redis_${DEPLOYMENT_ID:-latest}
     restart: unless-stopped
     networks:
       - laravel_network

@@ -42,34 +42,8 @@ sudo ufw allow https
 sudo ufw enable
 ```
 
-## 2. Set Up Directory Structure
 
-```bash
-# Create main application directory
-sudo mkdir -p /home/deployer/laravel
-sudo chown -R deployer:www-data /home/deployer/laravel
-sudo chmod -R 2775 /home/deployer/laravel
-
-# Create directory for Nginx configuration
-sudo mkdir -p /home/deployer/laravel/docker/nginx/conf.d
-sudo chown -R deployer:www-data /home/deployer/laravel/docker
-sudo chmod -R 775 /home/deployer/laravel/docker
-```
-
-## 3. Configure Docker Permissions
-
-```bash
-# Create Docker network
-docker network create laravel_network
-
-# Create Docker volumes
-docker volume create laravel_storage
-docker volume create laravel_bootstrap
-docker volume create laravel_app
-docker volume create dbdata
-```
-
-## 4. Set Up SSH Key for GitHub Actions
+## 2. Set Up SSH Key for GitHub Actions
 
 ```bash
 # Switch to deployer user
@@ -90,7 +64,7 @@ chmod 600 ~/.ssh/authorized_keys
 cat ~/.ssh/id_rsa
 ```
 
-## 5. Add GitHub Secrets
+## 3. Add GitHub Secrets
 
 Add the following secrets to your GitHub repository:
 

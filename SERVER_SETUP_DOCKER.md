@@ -8,47 +8,21 @@ This guide will help you set up your VPS for Laravel deployment with Docker, ens
 # Create user with proper primary group
 sudo adduser deployer --ingroup www-data
 sudo usermod -aG sudo deployer
-
-# Secure sudo access
-echo "deployer ALL=(ALL:ALL) ALL" | sudo tee /etc/sudoers.d/deployer
-echo 'Defaults:deployer !requiretty' | sudo tee -a /etc/sudoers.d/deployer  
-
-# Fix home directory permissions
-sudo chmod 711 /home/deployer
 ```
 
 ## 1. Initial Server Setup
 
 ```bash
-# Update the system
-sudo apt update
-sudo apt upgrade -y
-
 # Install Docker and Docker Compose
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+curl -fsSL https://get.docker.com | sudo sh
 
-# Add deployer to docker group
+# Add user to Docker group
 sudo usermod -aG docker deployer
-
-# Install UFW and configure
-sudo apt install -y ufw
-sudo ufw allow ssh
-sudo ufw allow http
-sudo ufw allow https
-sudo ufw enable
 ```
 
-
-## 2. Set Up SSH Key for GitHub Actions
+## 2. Set Up SSH Key for GitHub Actions (as deployer user)
 
 ```bash
-# Switch to deployer user
-su - deployer
-
 # Create SSH directory
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh

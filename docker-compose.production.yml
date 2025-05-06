@@ -1,7 +1,7 @@
 services:
   app:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
-    container_name: laravel_app
+    container_name: laravel_app_${DEPLOYMENT_ID:-latest}
     restart: unless-stopped
     working_dir: /var/www
     env_file: .env
@@ -9,13 +9,19 @@ services:
       - laravel_storage:/var/www/storage
       - laravel_public:/var/www/public
     networks:
-        - laravel_network
+      - laravel_network
     depends_on:
       - redis
+    healthcheck:
+      test: ["CMD", "php", "artisan", "queue:work", "--once"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   nginx:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
-    container_name: laravel_nginx
+    container_name: laravel_nginx_${DEPLOYMENT_ID:-latest}
     restart: unless-stopped
     ports:
       - "80:80"
@@ -26,15 +32,25 @@ services:
       - laravel_network
     depends_on:
       - app
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   redis:
     image: redis:alpine
-    container_name: laravel_redis
+    container_name: laravel_redis_${DEPLOYMENT_ID:-latest}
     restart: unless-stopped
     networks:
       - laravel_network
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   laravel_network:

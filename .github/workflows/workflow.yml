@@ -96,15 +96,16 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "${{ vars.ENV_FILE }}" > .env
+          # Create .env file with proper line endings
           {
-            echo "REGISTRY=${{ env.REGISTRY }}"
-            echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
-            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
-            echo "TAG=latest"
-            echo "TAG_BRANCH=main"
-            echo "GITHUB_USER=${{ github.actor }}"
-            echo "DEPLOYMENT_ID=$(date +%s)"
+            echo -n "${{ vars.ENV_FILE }}" | tr -d '\r' > .env
+            echo -e "\nREGISTRY=${{ env.REGISTRY }}"
+            echo -e "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
+            echo -e "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
+            echo -e "TAG=latest"
+            echo -e "TAG_BRANCH=main"
+            echo -e "GITHUB_USER=${{ github.actor }}"
+            echo -e "DEPLOYMENT_ID=$(date +%s)"
           } >> .env
 
       - name: Prepare remote directories
@@ -124,5 +125,8 @@ jobs:
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd ~/laravel
             chmod +x deploy.sh
+            # Convert line endings to Unix format
+            dos2unix deploy.sh
+            dos2unix .env
             ./deploy.sh
           EOF

@@ -63,10 +63,8 @@ jobs:
           tags: ${{ steps.meta-php.outputs.tags }}
           labels: ${{ steps.meta-php.outputs.labels }}
           platforms: linux/amd64
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.PHP_IMAGE_NAME }}:latest
-          cache-to: type=inline
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.PHP_IMAGE_NAME }}:latest,mode=max
 
       - name: Build and push Nginx image
         uses: docker/build-push-action@v5
@@ -77,10 +75,8 @@ jobs:
           tags: ${{ steps.meta-nginx.outputs.tags }}
           labels: ${{ steps.meta-nginx.outputs.labels }}
           platforms: linux/amd64
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}:latest
-          cache-to: type=inline
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}:latest,mode=max
 
   deploy:
     name: 🚀 Deploy to Server

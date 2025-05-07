@@ -115,7 +115,7 @@ jobs:
           scp -P ${{ secrets.SSH_PORT }} docker-compose.production.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
           scp -P ${{ secrets.SSH_PORT }} .env deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/
           scp -P ${{ secrets.SSH_PORT }} docker/nginx/conf.d/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/nginx/conf.d/
-          scp -r ${{ secrets.SSH_PORT }} docker/logstash ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/
+          scp -P ${{ secrets.SSH_PORT }} -r docker/logstash ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/
 
       - name: Deploy on server
         run: |

@@ -8,7 +8,7 @@ use App\Services\ElasticsearchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class ReindexArticlesToElasticsearchimplements implements ShouldQueue
+class ReindexArticles implements ShouldQueue
 {
     use Queueable;
 

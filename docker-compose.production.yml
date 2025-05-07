@@ -33,7 +33,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 64M
+          memory: 32M
 
   redis:
     image: redis:alpine
@@ -46,7 +46,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 48M
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
@@ -54,13 +54,17 @@ services:
     environment:
       - discovery.type=single-node
 #      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+      - ES_JAVA_OPTS=-Xms128m -Xmx128m
       - xpack.security.enabled=false
       - xpack.monitoring.collection.enabled=true
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
       - laravel_network
+    deploy:
+      resources:
+        limits:
+          memory: 192M
 
   kibana:
     image: docker.elastic.co/kibana/kibana:9.0.1
@@ -74,7 +78,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 96M
 
   logstash:
     image: docker.elastic.co/logstash/logstash:9.0.1
@@ -95,7 +99,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 64M
 
 networks:
   laravel_network:

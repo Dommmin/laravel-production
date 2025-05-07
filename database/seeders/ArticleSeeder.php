@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Article;
-use App\Models\User;
 use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class ArticleSeeder extends Seeder
 {
@@ -17,17 +16,19 @@ class ArticleSeeder extends Seeder
     {
         $users = User::all();
         $tags = Tag::all();
+
         $locations = [
             ['lat' => 52.2297, 'lon' => 21.0122, 'city_name' => 'Warszawa'],
             ['lat' => 50.0647, 'lon' => 19.9450, 'city_name' => 'Kraków'],
             ['lat' => 51.1079, 'lon' => 17.0385, 'city_name' => 'Wrocław'],
         ];
-        foreach (range(1, 1000) as $i) {
+
+        for ($i = 0; $i < 1000; $i++) {
             $user = $users->random();
             $loc = $locations[array_rand($locations)];
             $article = Article::create([
-                'title' => "Przykładowy artykuł $i",
-                'content' => "To jest treść artykułu $i o technologii.",
+                'title' => fake()->paragraph(1),
+                'content' => fake()->realTextBetween(100, 200),
                 'user_id' => $user->id,
                 'location' => ['lat' => $loc['lat'], 'lon' => $loc['lon']],
                 'city_name' => $loc['city_name'],

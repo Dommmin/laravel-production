@@ -18,6 +18,7 @@ class ArticleFactory extends Factory
             ['name' => 'Wrocław', 'lat' => 51.1079, 'lon' => 17.0385],
         ];
         $city = $this->faker->randomElement($cities);
+
         return [
             'title' => $this->faker->sentence(),
             'content' => $this->faker->paragraph(),
@@ -26,4 +27,4 @@ class ArticleFactory extends Factory
             'city_name' => $city['name'],
         ];
     }
-} 
+}

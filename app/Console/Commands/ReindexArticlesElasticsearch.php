@@ -2,21 +2,22 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Jobs\ReindexArticles;
 use App\Services\ElasticsearchService;
-use App\Jobs\ReindexArticlesToElasticsearch;
+use Illuminate\Console\Command;
 
 class ReindexArticlesElasticsearch extends Command
 {
     protected $signature = 'es:reindex-articles';
-    protected $description = 'Tworzy indeks articles z mappingiem i reindeksuje artykuły do Elasticsearch';
 
-    public function handle(ElasticsearchService $es)
+    protected $description = 'Creates the articles index with mapping and reindexes articles to Elasticsearch';
+
+    public function handle(ElasticsearchService $es): void
     {
-        $this->info('Tworzę indeks articles z mappingiem...');
+        $this->info('Creating index articles with mapping...');
         $es->createArticlesIndex();
-        $this->info('Reindeksuję artykuły...');
-        dispatch_sync(new ReindexArticlesToElasticsearch());
-        $this->info('Gotowe!');
+        $this->info('Reindexing articles...');
+        ReindexArticles::dispatchSync();
+        $this->info('Done!');
     }
-} 
+}

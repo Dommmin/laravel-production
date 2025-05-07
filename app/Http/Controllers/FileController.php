@@ -20,7 +20,7 @@ class FileController extends Controller
     public function store(Request $request)
     {
         if ($file = $request->file('file')) {
-            $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid().'.'.$file->getClientOriginalExtension();
             $path = Storage::disk('public')->putFileAs('files', $file, $fileName);
             $name = $file->getClientOriginalName();
 

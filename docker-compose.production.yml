@@ -36,48 +36,48 @@ services:
     volumes:
       - redis_data:/data
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
-    container_name: laravel_elasticsearch
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-      - xpack.security.enabled=false
-      - xpack.monitoring.collection.enabled=true
-    ports:
-      - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      - laravel_network
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:9.0.1
-    container_name: laravel_kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - laravel_network
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:9.0.1
-    container_name: laravel_filebeat
-    user: root
-    volumes:
-      - ./docker/local/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - laravel_storage:/logs:ro
-      - /var/log/nginx:/nginx-logs:ro
-      - /var/log/php8:/php-logs:ro
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-    networks:
-      - laravel_network
+#  elasticsearch:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
+#    container_name: laravel_elasticsearch
+#    environment:
+#      - discovery.type=single-node
+#      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+#      - xpack.security.enabled=false
+#      - xpack.monitoring.collection.enabled=true
+#    ports:
+#      - "9200:9200"
+#    volumes:
+#      - esdata:/usr/share/elasticsearch/data
+#    networks:
+#      - laravel_network
+#
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:9.0.1
+#    container_name: laravel_kibana
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+#    ports:
+#      - "5601:5601"
+#    depends_on:
+#      - elasticsearch
+#    networks:
+#      - laravel_network
+#
+#  filebeat:
+#    image: docker.elastic.co/beats/filebeat:9.0.1
+#    container_name: laravel_filebeat
+#    user: root
+#    volumes:
+#      - ./docker/local/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+#      - laravel_storage:/logs:ro
+#      - /var/log/nginx:/nginx-logs:ro
+#      - /var/log/php8:/php-logs:ro
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+#    depends_on:
+#      - elasticsearch
+#    networks:
+#      - laravel_network
 
 networks:
   laravel_network:
@@ -87,5 +87,5 @@ volumes:
   laravel_storage:
   laravel_public:
   redis_data:
-  esdata:
-    driver: local
+#  esdata:
+#    driver: local

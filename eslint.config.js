@@ -38,6 +38,14 @@ export default [
         },
     },
     {
+        rules: {
+            '@typescript-eslint/no-unused-vars': 'warn',
+            'no-unused-vars': 'warn',
+            '@typescript-eslint/no-explicit-any': 'warn',
+            '@typescript-eslint/ban-ts-comment': 'warn',
+        },
+    },
+    {
         ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
     },
     prettier, // Turn off all rules that might conflict with Prettier

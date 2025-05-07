@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Services;
 
-use App\Services\CityService;
-use PHPUnit\Framework\TestCase;
-use Mockery;
 use App\Models\Article;
+use App\Services\CityService;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class CityServiceTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -17,9 +17,9 @@ class CityServiceTest extends TestCase
 
     public function test_get_available_cities_returns_cities()
     {
-        $mock = Mockery::mock('alias:' . Article::class);
+        $mock = Mockery::mock('alias:'.Article::class);
         $mock->shouldReceive('query->distinct->pluck->all')->andReturn(['Warszawa', 'Kraków']);
-        $service = new CityService();
+        $service = new CityService;
         $this->assertEquals(['Warszawa', 'Kraków'], $service->getAvailableCities());
     }
-} 
+}

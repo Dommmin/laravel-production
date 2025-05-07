@@ -4,10 +4,15 @@ namespace App\Services;
 
 use Illuminate\Support\Arr;
 
+/**
+ * Serwis do wyszukiwania artykułów w Elasticsearch z filtrami, paginacją i agregacjami
+ */
 class ArticleSearchService
 {
     protected ElasticsearchService $es;
+
     protected CityService $cityService;
+
     protected TagService $tagService;
 
     public function __construct(ElasticsearchService $es, CityService $cityService, TagService $tagService)
@@ -19,8 +24,6 @@ class ArticleSearchService
 
     /**
      * Wyszukiwanie artykułów z agregacjami, filtrami, paginacją.
-     * @param array $params
-     * @return array
      */
     public function search(array $params): array
     {
@@ -41,46 +44,46 @@ class ArticleSearchService
             if (mb_strlen($query) <= 2) {
                 $must[] = [
                     'wildcard' => [
-                        'title' => "*{$query}*"
-                    ]
+                        'title' => "*{$query}*",
+                    ],
                 ];
             } else {
                 $must[] = [
                     'multi_match' => [
-                        'query'     => $query,
-                        'fields'    => ['title^2', 'tags'],
+                        'query' => $query,
+                        'fields' => ['title^2', 'tags'],
                         'fuzziness' => 'auto',
-                        'operator'  => 'and',
+                        'operator' => 'and',
                         'minimum_should_match' => '100%',
-                    ]
+                    ],
                 ];
             }
         }
 
         if ($tag) {
             $must[] = [
-                'term' => ['tags' => $tag]
+                'term' => ['tags' => $tag],
             ];
         }
 
         if ($city) {
             $filter[] = [
-                'term' => ['city_name' => $city]
+                'term' => ['city_name' => $city],
             ];
         }
 
         if ($lat && $lon && $radius > 0) {
-            $filter = array_filter($filter, function($f) {
-                return !isset($f['term']['city_name']);
+            $filter = array_filter($filter, function ($f) {
+                return ! Arr::has($f, 'term.city_name');
             });
             $filter[] = [
                 'geo_distance' => [
-                    'distance' => $radius . 'km',
+                    'distance' => $radius.'km',
                     'location' => [
-                        'lat' => (float)$lat,
-                        'lon' => (float)$lon,
-                    ]
-                ]
+                        'lat' => (float) $lat,
+                        'lon' => (float) $lon,
+                    ],
+                ],
             ];
         }
 
@@ -88,14 +91,14 @@ class ArticleSearchService
             'index' => 'articles',
             'from' => $from,
             'size' => $size,
-            'body'  => [
+            'body' => [
                 'query' => [
                     'bool' => [
-                        'must'   => $must,
+                        'must' => $must,
                         'filter' => $filter,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
 
         $articles = collect($results['hits']['hits'])->map(function ($hit) {
@@ -112,17 +115,17 @@ class ArticleSearchService
                     'cities' => [
                         'terms' => [
                             'field' => 'city_name.keyword',
-                            'size' => 100
-                        ]
+                            'size' => 100,
+                        ],
                     ],
                     'tags' => [
                         'terms' => [
                             'field' => 'tags.keyword',
-                            'size' => 100
-                        ]
-                    ]
-                ]
-            ]
+                            'size' => 100,
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
         $cities = $this->cityService->getAvailableCities();

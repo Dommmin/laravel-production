@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Article;
+use App\Observers\ArticleObserver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use App\Models\Article;
-use App\Observers\ArticleObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        if (!app()->runningUnitTests()) {
+        if (! app()->runningUnitTests()) {
             Article::observe(ArticleObserver::class);
         }
     }

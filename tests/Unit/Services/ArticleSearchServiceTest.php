@@ -3,15 +3,15 @@
 namespace Tests\Unit\Services;
 
 use App\Services\ArticleSearchService;
-use App\Services\ElasticsearchService;
 use App\Services\CityService;
+use App\Services\ElasticsearchService;
 use App\Services\TagService;
-use PHPUnit\Framework\TestCase;
 use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class ArticleSearchServiceTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -27,9 +27,10 @@ class ArticleSearchServiceTest extends TestCase
                     'aggregations' => [
                         'cities' => ['buckets' => [['key' => 'Warszawa', 'doc_count' => 1]]],
                         'tags' => ['buckets' => [['key' => 'laravel', 'doc_count' => 1]]],
-                    ]
+                    ],
                 ];
             }
+
             // wyniki wyszukiwania
             return [
                 'hits' => [
@@ -38,10 +39,10 @@ class ArticleSearchServiceTest extends TestCase
                             'title' => 'Test title',
                             'tags' => ['laravel'],
                             'city_name' => 'Warszawa',
-                        ]]
+                        ]],
                     ],
-                    'total' => ['value' => 1]
-                ]
+                    'total' => ['value' => 1],
+                ],
             ];
         });
 
@@ -75,10 +76,10 @@ class ArticleSearchServiceTest extends TestCase
                             'title' => 'Artykuł Laravel',
                             'tags' => ['laravel'],
                             'city_name' => 'Warszawa',
-                        ]]
+                        ]],
                     ],
-                    'total' => ['value' => 1]
-                ]
+                    'total' => ['value' => 1],
+                ],
             ];
         });
         $mockCity = Mockery::mock(CityService::class);
@@ -103,10 +104,10 @@ class ArticleSearchServiceTest extends TestCase
                             'title' => 'Artykuł z Krakowa',
                             'tags' => ['php'],
                             'city_name' => 'Kraków',
-                        ]]
+                        ]],
                     ],
-                    'total' => ['value' => 1]
-                ]
+                    'total' => ['value' => 1],
+                ],
             ];
         });
         $mockCity = Mockery::mock(CityService::class);
@@ -135,18 +136,19 @@ class ArticleSearchServiceTest extends TestCase
                                 'tags' => ['php'],
                                 'city_name' => 'Kraków',
                                 'location' => ['lat' => 50.0647, 'lon' => 19.9450],
-                            ]]
+                            ]],
                         ],
-                        'total' => ['value' => 1]
-                    ]
+                        'total' => ['value' => 1],
+                    ],
                 ];
             }
+
             // Domyślnie pusta lista
             return [
                 'hits' => [
                     'hits' => [],
-                    'total' => ['value' => 0]
-                ]
+                    'total' => ['value' => 0],
+                ],
             ];
         });
         $mockCity = Mockery::mock(CityService::class);
@@ -157,7 +159,7 @@ class ArticleSearchServiceTest extends TestCase
         $result = $service->search([
             'lat' => 51.1079, // Wrocław
             'lon' => 17.0385,
-            'radius' => 300
+            'radius' => 300,
         ]);
         $this->assertCount(1, $result['articles']);
         $this->assertEquals('Kraków', $result['articles'][0]['city_name']);

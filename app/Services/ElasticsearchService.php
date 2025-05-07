@@ -2,18 +2,32 @@
 
 namespace App\Services;
 
+use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
+use Elastic\Elasticsearch\Exception\AuthenticationException;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
 
 class ElasticsearchService
 {
-    public function client()
+    /**
+     * @throws AuthenticationException
+     */
+    public function client(): Client
     {
         return ClientBuilder::create()
             ->setHosts([config('elasticsearch.host')])
             ->build();
     }
 
-    public function createArticlesIndex()
+    /**
+     * @throws AuthenticationException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     * @throws MissingParameterException
+     */
+    public function createArticlesIndex(): void
     {
         $params = [
             'index' => 'articles',
@@ -23,46 +37,58 @@ class ElasticsearchService
                         'analyzer' => [
                             'autocomplete' => [
                                 'tokenizer' => 'autocomplete',
-                                'filter' => ['lowercase']
-                            ]
+                                'filter' => ['lowercase'],
+                            ],
                         ],
                         'tokenizer' => [
                             'autocomplete' => [
                                 'type' => 'edge_ngram',
                                 'min_gram' => 1,
                                 'max_gram' => 20,
-                                'token_chars' => ['letter', 'digit']
-                            ]
-                        ]
-                    ]
+                                'token_chars' => ['letter', 'digit'],
+                            ],
+                        ],
+                    ],
                 ],
                 'mappings' => [
                     'properties' => [
                         'title' => [
                             'type' => 'text',
                             'analyzer' => 'autocomplete',
-                            'search_analyzer' => 'standard'
+                            'search_analyzer' => 'standard',
                         ],
                         'tags' => [
-                            'type' => 'keyword'
+                            'type' => 'keyword',
                         ],
                         'user' => [
-                            'type' => 'keyword'
+                            'type' => 'keyword',
                         ],
                         'location' => [
-                            'type' => 'geo_point'
+                            'type' => 'geo_point',
                         ],
                         'city_name' => [
-                            'type' => 'keyword'
-                        ]
-                    ]
-                ]
-            ]
+                            'type' => 'keyword',
+                        ],
+                    ],
+                ],
+            ],
         ];
-        // Usuń indeks jeśli istnieje
+
         if ($this->client()->indices()->exists(['index' => 'articles'])->asBool()) {
             $this->client()->indices()->delete(['index' => 'articles']);
         }
+
         $this->client()->indices()->create($params);
+    }
+
+    /**
+     * @throws AuthenticationException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     * @throws MissingParameterException
+     */
+    public function index(array $params)
+    {
+        return $this->client()->index($params);
     }
 }

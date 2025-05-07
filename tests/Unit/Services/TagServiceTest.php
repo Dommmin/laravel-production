@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Services;
 
-use App\Services\TagService;
-use PHPUnit\Framework\TestCase;
-use Mockery;
 use App\Models\Tag;
+use App\Services\TagService;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class TagServiceTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -17,9 +17,9 @@ class TagServiceTest extends TestCase
 
     public function test_get_available_tags_returns_tags()
     {
-        $mock = Mockery::mock('alias:' . Tag::class);
+        $mock = Mockery::mock('alias:'.Tag::class);
         $mock->shouldReceive('query->pluck->all')->andReturn(['laravel', 'php']);
-        $service = new TagService();
+        $service = new TagService;
         $this->assertEquals(['laravel', 'php'], $service->getAvailableTags());
     }
-} 
+}

@@ -41,3 +41,20 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+interface Article {
+    id: number;
+    title: string;
+    slug: string;
+    content: string;
+    user: string | { name: string };
+    tags: string[];
+    created_at: string;
+    updated_at: string;
+    location?: {
+        lat: number;
+        lon: number;
+    };
+    location_name?: string;
+    city_name?: string;
+}

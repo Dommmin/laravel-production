@@ -12,6 +12,10 @@ services:
       - laravel_network
     depends_on:
       - redis
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
   nginx:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
@@ -26,6 +30,10 @@ services:
       - laravel_network
     depends_on:
       - app
+    deploy:
+      resources:
+        limits:
+          memory: 64M
 
   redis:
     image: redis:alpine
@@ -35,13 +43,18 @@ services:
       - laravel_network
     volumes:
       - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
     container_name: laravel_elasticsearch
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+#      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
       - xpack.security.enabled=false
       - xpack.monitoring.collection.enabled=true
     volumes:
@@ -58,6 +71,10 @@ services:
       - elasticsearch
     networks:
       - laravel_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   logstash:
     image: docker.elastic.co/logstash/logstash:9.0.1
@@ -75,6 +92,10 @@ services:
       - elasticsearch
     networks:
       - laravel_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
 networks:
   laravel_network:

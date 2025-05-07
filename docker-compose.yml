@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
     app:
         build:
@@ -93,7 +95,7 @@ services:
 
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
-        container_name: ${COMPOSE_PROJECT_NAME}_elasticsearch
+        container_name: laravel_elasticsearch
         environment:
             - discovery.type=single-node
             - ES_JAVA_OPTS=-Xms1g -Xmx1g
@@ -108,11 +110,28 @@ services:
 
     kibana:
         image: docker.elastic.co/kibana/kibana:9.0.1
-        container_name: ${COMPOSE_PROJECT_NAME}_kibana
+        container_name: laravel_kibana
         environment:
             - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
         ports:
             - "5601:5601"
+        depends_on:
+            - elasticsearch
+        networks:
+            - laravel-network
+
+    logstash:
+        image: docker.elastic.co/logstash/logstash:9.0.1
+        container_name: laravel_logstash
+        volumes:
+            - ./docker/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+            - ./docker/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+            - ./docker/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+            - ./storage/logs:/var/www/storage/logs:ro
+            - /var/log/nginx:/var/log/nginx:ro
+            - /var/log/php8:/var/log/php8:ro
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
         depends_on:
             - elasticsearch
         networks:

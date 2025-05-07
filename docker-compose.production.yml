@@ -59,15 +59,16 @@ services:
     networks:
       - laravel_network
 
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:9.0.1
-    container_name: laravel_filebeat
-    user: root
+  logstash:
+    image: docker.elastic.co/logstash/logstash:9.0.1
+    container_name: laravel_logstash
     volumes:
-      - ./docker/local/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - laravel_storage:/logs:ro
-      - /var/log/nginx:/nginx-logs:ro
-      - /var/log/php8:/php-logs:ro
+      - ./docker/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./docker/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./docker/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - laravel_storage:/var/www/storage/logs:ro
+      - /var/log/nginx:/var/log/nginx:ro
+      - /var/log/php8:/var/log/php8:ro
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     depends_on:

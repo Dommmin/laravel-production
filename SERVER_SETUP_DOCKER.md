@@ -57,6 +57,7 @@ Create the following files in your Laravel project:
 ### 4.1 Docker Configuration Files
 
 1. Create `docker/php/Dockerfile`:
+
 ```dockerfile
 FROM node:22-alpine AS node-builder
 
@@ -149,6 +150,7 @@ CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
 ```
 
 2. Create `docker/nginx/Dockerfile`:
+
 ```dockerfile
 FROM node:22-alpine AS node-builder
 
@@ -179,6 +181,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 3. Create `docker-compose.production.yml`:
+
 ```yaml
 services:
   app:

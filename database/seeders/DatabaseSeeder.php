@@ -13,11 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'email_verified_at' => now(),
-            'password' => bcrypt('Pa$$w0rd!'),
+        $this->call([
+            UserSeeder::class,
+            TagSeeder::class,
+            ArticleSeeder::class,
+            // CitySeeder::class,
         ]);
     }
 }

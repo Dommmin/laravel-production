@@ -39,6 +39,14 @@ setup-test-db:
 test: setup-test-db
 	docker compose exec app php artisan test --env=testing
 
+# Run quality tools
+quality:
+	docker compose exec app composer larastan
+	docker compose exec app composer pint
+	docker compose exec app npm run format
+	docker compose exec app npm run types
+	docker compose exec app npm run lint
+
 # Setup project from scratch
 setup: build up
 	docker compose exec app composer install

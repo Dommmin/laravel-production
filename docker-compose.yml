@@ -2,12 +2,12 @@ services:
     app:
         build:
             context: .
-            dockerfile: docker/local/php/Dockerfile
+            dockerfile: ./docker/local/php/Dockerfile
             args:
-                USER_ID: ${USER_ID:-1000}
-                GROUP_ID: ${GROUP_ID:-1000}
+                - USER_ID=${USER_ID:-1000}
+                - GROUP_ID=${GROUP_ID:-1000}
         container_name: ${COMPOSE_PROJECT_NAME}_app
-        command: /usr/local/bin/start.sh
+        command: ["sh", "-c", "/usr/local/bin/start.sh"]
         restart: unless-stopped
         working_dir: /var/www
         volumes:
@@ -15,9 +15,6 @@ services:
             - ./docker/local/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
             - ./docker/local/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
             - ./docker/local/supervisord.conf:/etc/supervisor/supervisord.conf
-        environment:
-            - APP_ENV=${APP_ENV:-local}
-            - APP_DEBUG=${APP_DEBUG:-true}
         networks:
             - laravel-network
         ports:
@@ -35,13 +32,11 @@ services:
         restart: unless-stopped
         ports:
             - "80:80"
-            - "443:443"
         volumes:
             - ./:/var/www
             - ./docker/local/nginx/conf.d:/etc/nginx/conf.d
-            - nginx_logs:/var/log/nginx
         depends_on:
-            - app
+            -   app
         networks:
             - laravel-network
 
@@ -52,13 +47,16 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_DATABASE}
-            MYSQL_USER: ${DB_USERNAME}
-            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE_TEST: laravel_test
+        command:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
             interval: 5s
             timeout: 3s
-            retries: 10
+            retries: 5
+            start_period: 60s
         ports:
             - "3306:3306"
         volumes:
@@ -71,10 +69,11 @@ services:
         container_name: ${COMPOSE_PROJECT_NAME}_redis
         restart: unless-stopped
         healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
+            test: [ "CMD", "redis-cli", "ping" ]
             interval: 5s
             timeout: 3s
             retries: 5
+            start_period: 60s
         ports:
             - "6379:6379"
         networks:
@@ -87,13 +86,60 @@ services:
         ports:
             - "1025:1025"
             - "8025:8025"
+        volumes:
+            - mailhog_data:/maildir
         networks:
             - laravel-network
 
-volumes:
-    mysql_data:
-    nginx_logs:
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
+        container_name: ${COMPOSE_PROJECT_NAME}_elasticsearch
+        environment:
+            - discovery.type=single-node
+            - ES_JAVA_OPTS=-Xms1g -Xmx1g
+            - xpack.security.enabled=false
+            - xpack.monitoring.collection.enabled=true
+        ports:
+            - "9200:9200"
+        volumes:
+            - esdata:/usr/share/elasticsearch/data
+        networks:
+            - laravel-network
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:9.0.1
+        container_name: ${COMPOSE_PROJECT_NAME}_kibana
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        ports:
+            - "5601:5601"
+        depends_on:
+            - elasticsearch
+        networks:
+            - laravel-network
+
+    filebeat:
+        image: docker.elastic.co/beats/filebeat:9.0.1
+        container_name: ${COMPOSE_PROJECT_NAME}_filebeat
+        user: root
+        volumes:
+            - ./docker/local/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+            - ./storage/logs:/logs:ro
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        depends_on:
+            - elasticsearch
+        networks:
+            - laravel-network
 
 networks:
     laravel-network:
         driver: bridge
+
+volumes:
+    mysql_data:
+        driver: local
+    mailhog_data:
+        driver: local
+    esdata:
+        driver: local

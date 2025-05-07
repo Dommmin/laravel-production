@@ -34,3 +34,5 @@ supervisord.log
 supervisord.pid
 
 docker/local/nginx/log/
+
+.composer/

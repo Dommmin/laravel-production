@@ -12,10 +12,6 @@ services:
       - laravel_network
     depends_on:
       - redis
-    deploy:
-      resources:
-        limits:
-          memory: 128M
 
   nginx:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
@@ -30,10 +26,6 @@ services:
       - laravel_network
     depends_on:
       - app
-    deploy:
-      resources:
-        limits:
-          memory: 32M
 
   redis:
     image: redis:alpine
@@ -43,63 +35,47 @@ services:
       - laravel_network
     volumes:
       - redis_data:/data
-    deploy:
-      resources:
-        limits:
-          memory: 48M
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
-    container_name: laravel_elasticsearch
-    environment:
-      - discovery.type=single-node
-#      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-      - ES_JAVA_OPTS=-Xms128m -Xmx128m
-      - xpack.security.enabled=false
-      - xpack.monitoring.collection.enabled=true
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      - laravel_network
-    deploy:
-      resources:
-        limits:
-          memory: 192M
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:9.0.1
-    container_name: laravel_kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-    networks:
-      - laravel_network
-    deploy:
-      resources:
-        limits:
-          memory: 96M
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash:9.0.1
-    container_name: laravel_logstash
-    volumes:
-      - ./docker/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-      - ./docker/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
-      - ./docker/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - laravel_storage:/var/www/storage/logs:ro
-      - /var/log/nginx:/var/log/nginx:ro
-      - /var/log/php8:/var/log/php8:ro
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-    networks:
-      - laravel_network
-    deploy:
-      resources:
-        limits:
-          memory: 64M
+#  elasticsearch:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
+#    container_name: laravel_elasticsearch
+#    environment:
+#      - discovery.type=single-node
+##      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+#      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+#      - xpack.security.enabled=false
+#      - xpack.monitoring.collection.enabled=true
+#    volumes:
+#      - esdata:/usr/share/elasticsearch/data
+#    networks:
+#      - laravel_network
+#
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:9.0.1
+#    container_name: laravel_kibana
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+#    depends_on:
+#      - elasticsearch
+#    networks:
+#      - laravel_network
+#
+#  logstash:
+#    image: docker.elastic.co/logstash/logstash:9.0.1
+#    container_name: laravel_logstash
+#    volumes:
+#      - ./docker/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+#      - ./docker/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+#      - ./docker/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+#      - laravel_storage:/var/www/storage/logs:ro
+#      - /var/log/nginx:/var/log/nginx:ro
+#      - /var/log/php8:/var/log/php8:ro
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+#    depends_on:
+#      - elasticsearch
+#    networks:
+#      - laravel_network
 
 networks:
   laravel_network:

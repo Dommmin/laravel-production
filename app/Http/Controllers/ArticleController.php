@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\ArticleFilterData;
+use App\Http\Requests\IndexArticleRequest;
 use App\Models\Article;
 use App\Services\ArticleSearchService;
+use App\Services\CityService;
 use App\Services\ElasticsearchService;
+use App\Services\TagService;
+use Elastic\Elasticsearch\Exception\AuthenticationException;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Illuminate\Http\JsonResponse;
@@ -14,13 +19,23 @@ use Inertia\Response;
 
 class ArticleController extends Controller
 {
-    public function __construct(private readonly ElasticsearchService $es) {}
+    public function __construct(private readonly ElasticsearchService $es, private readonly CityService $cityService, private readonly TagService $tagService) {}
 
-    public function index(Request $request, ArticleSearchService $searchService): Response
+    /**
+     * @throws AuthenticationException
+     * @throws ServerResponseException
+     * @throws ClientResponseException
+     */
+    public function index(IndexArticleRequest $request, ArticleSearchService $searchService): Response
     {
-        $result = $searchService->search($request->all());
+        $filters = ArticleFilterData::from($request->validated());
+        $result = $searchService->search($filters);
 
-        return Inertia::render('home', $result);
+        return Inertia::render('home', array_merge($result, [
+            'cities' => $this->cityService->getAvailableCities(),
+            'tags' => $this->tagService->getAvailableTags(),
+        ])
+        );
     }
 
     public function show(Article $article): Response
@@ -31,8 +46,9 @@ class ArticleController extends Controller
     }
 
     /**
-     * @throws ServerResponseException
+     * @throws AuthenticationException
      * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     public function similar(Request $request, Article $article): JsonResponse
     {
@@ -66,6 +82,7 @@ class ArticleController extends Controller
     /**
      * @throws ServerResponseException
      * @throws ClientResponseException
+     * @throws AuthenticationException
      */
     public function cityAggregation(): JsonResponse
     {

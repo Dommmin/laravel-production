@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Jobs\ReindexArticles;
 use App\Models\Article;
 use App\Services\ElasticsearchService;
+use Elastic\Elasticsearch\Exception\AuthenticationException;
 
 class ArticleObserver
 {
@@ -26,6 +27,8 @@ class ArticleObserver
 
     /**
      * Handle the Article "deleted" event.
+     *
+     * @throws AuthenticationException
      */
     public function deleted(Article $article): void
     {

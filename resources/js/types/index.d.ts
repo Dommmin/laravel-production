@@ -58,3 +58,19 @@ interface Article {
     location_name?: string;
     city_name?: string;
 }
+
+interface FiltersProps {
+    q: string;
+    setQuery: (query: string) => void;
+    tag: string;
+    setTag: (tag: string) => void;
+    city: string;
+    setCity: (city: string) => void;
+    radius: number;
+    setRadius: (radius: number) => void;
+    cities: string[];
+    tags: string[];
+    lat: string;
+    lon: string;
+    page: number;
+}

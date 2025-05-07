@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     app:
         build:
@@ -130,20 +128,6 @@ services:
             - ./storage/logs:/var/www/storage/logs:ro
             - /var/log/nginx:/var/log/nginx:ro
             - /var/log/php8:/var/log/php8:ro
-        environment:
-            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-        depends_on:
-            - elasticsearch
-        networks:
-            - laravel-network
-
-    filebeat:
-        image: docker.elastic.co/beats/filebeat:9.0.1
-        container_name: ${COMPOSE_PROJECT_NAME}_filebeat
-        user: root
-        volumes:
-            - ./docker/local/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-            - ./storage/logs:/logs:ro
         environment:
             - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
         depends_on:

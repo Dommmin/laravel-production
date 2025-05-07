@@ -1,6 +1,5 @@
 import { Article } from '@/types';
 import { Link } from '@inertiajs/react';
-import { route } from 'ziggy-js';
 
 export function ArticlesTable({ articles }: { articles: Article[] }) {
     if (articles.length === 0) {

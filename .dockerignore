@@ -8,3 +8,4 @@ deploy.sh
 docker-compose.production.yml
 docker-compose.yml
 Makefile
+public/build

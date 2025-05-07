@@ -9,9 +9,11 @@ echo "🚀 Starting deployment..."
 echo "📥 Pulling latest Docker images..."
 docker compose pull
 
-# Restart containers
+if [ "$(docker ps -q --filter "name=app")" ]; then
 echo "🔄 Restarting containers..."
-docker compose down
+    docker compose down
+fi
+
 docker compose up -d
 
 # Run Laravel commands

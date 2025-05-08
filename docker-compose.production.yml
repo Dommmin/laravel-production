@@ -20,8 +20,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - laravel_storage:/var/www/storage:ro
-      - laravel_public:/var/www/public:ro
+      - laravel_storage:/var/www/storage
+      - laravel_public:/var/www/public
     networks:
       - laravel_network
     depends_on:

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FileController;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
@@ -29,6 +30,11 @@ Route::get('/', [ArticleController::class, 'index'])->name('home');
 Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/articles/{article}/similar', [ArticleController::class, 'similar'])->name('articles.similar');
 Route::get('/articles/aggregation/cities', [ArticleController::class, 'cityAggregation'])->name('articles.aggregation.cities');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/send', [ChatController::class, 'store'])->name('chat.send');
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

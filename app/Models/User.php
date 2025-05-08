@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -44,5 +45,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public static function getChatUsers(): Collection
+    {
+        return self::query()
+            ->where('id', '!=', auth()->id())
+            ->get();
+    }
+
+    public static function getRecipient(?int $recipientId)
+    {
+        return self::query()
+            ->where('id', $recipientId)
+            ->first();
     }
 }

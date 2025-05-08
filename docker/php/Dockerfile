@@ -52,7 +52,7 @@ COPY --chown=appuser:appuser --from=node-builder /var/www/public/build /var/www/
 
 # Copy configuration files
 COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
-COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/php.ini
 COPY --chown=appuser:appuser docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Create required directories

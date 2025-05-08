@@ -12,13 +12,12 @@ const PAGE_SIZE = 20;
 
 interface HomeProps {
     articles: Article[];
-    total: number;
     filters: FiltersProps;
     cities: string[];
     tags: string[];
 }
 
-export default function Home({ articles, total, filters, cities, tags }: HomeProps) {
+export default function Home({ articles, filters, cities, tags }: HomeProps) {
     const [query, setQuery] = useState(filters.q || '');
     const [tag, setTag] = useState(filters.tag || '');
     const [city, setCity] = useState(filters.city || '');
@@ -51,8 +50,6 @@ export default function Home({ articles, total, filters, cities, tags }: HomePro
         setPage(newPage);
         router.get('/', { q: query, tag, city, radius, lat, lon, page: newPage }, { preserveState: true, replace: true });
     };
-
-    const totalPages = Math.ceil(total / PAGE_SIZE);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

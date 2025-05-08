@@ -17,6 +17,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $title
+ * @property string $slug
  * @property string $content
  * @property int $user_id
  * @property array<array-key, mixed>|null $location
@@ -35,6 +36,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article whereLocation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Article whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article whereUserId($value)

@@ -29,13 +29,24 @@ class ArticleController extends Controller
     public function index(IndexArticleRequest $request, ArticleSearchService $searchService): Response
     {
         $filters = ArticleFilterData::from($request->validated());
-        $result = $searchService->search($filters);
+        $cities = $this->cityService->getAvailableCities();
+        $tags = $this->tagService->getAvailableTags();
 
-        return Inertia::render('home', array_merge($result, [
-            'cities' => $this->cityService->getAvailableCities(),
-            'tags' => $this->tagService->getAvailableTags(),
-        ])
-        );
+        if (config('elasticsearch.enabled')) {
+            $result = $searchService->search($filters);
+
+            return Inertia::render('home/elastic', array_merge($result, [
+                'cities' => $cities,
+                'tags' => $tags,
+            ]));
+        }
+
+        return Inertia::render('home/index', [
+            'articles' => Article::getArticlesForIndex($filters),
+            'filters' => $filters,
+            'cities' => $cities,
+            'tags' => $tags,
+        ]);
     }
 
     public function show(Article $article): Response

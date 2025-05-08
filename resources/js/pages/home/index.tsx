@@ -1,17 +1,25 @@
 import { ArticlesTable } from '@/components/home/articles-table';
-import { PaginationControls } from '@/components/home/pagination-controls';
 import { SearchFilters } from '@/components/home/search-filters';
+import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { Article, BreadcrumbItem, FiltersProps } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Home', href: '/' }];
 
-const PAGE_SIZE = 20;
-
 interface HomeProps {
-    articles: Article[];
+    articles: {
+        data: Article[];
+        total: number;
+        last_page: number;
+        prev_page_url: string | null;
+        next_page_url: string | null;
+        current_page: number;
+        from: number;
+        to: number;
+    };
     filters: FiltersProps;
     cities: string[];
     tags: string[];
@@ -24,18 +32,18 @@ export default function Home({ articles, filters, cities, tags }: HomeProps) {
     const [radius, setRadius] = useState(filters.radius || 0);
     const [lat, setLat] = useState(filters.lat || '');
     const [lon, setLon] = useState(filters.lon || '');
-    const [page, setPage] = useState(Number(filters.page) || 1);
+    const [page] = useState(Number(filters.page) || 1);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            router.get('/', { q: query, tag, city, radius, lat, lon, page: 1 }, { preserveState: true, replace: true });
+            router.get('/', { q: query, tag, city, radius, lat, lon, page }, { preserveState: true, replace: true });
         }, 400);
         return () => clearTimeout(timeout);
-    }, [query, tag, city, radius, lat, lon]);
+    }, [query, tag, city, radius, lat, lon, page]);
 
     useEffect(() => {
         if (city) {
-            const found = articles.find((a) => a.city_name === city);
+            const found = articles.data.find((a) => a.city_name === city);
             if (found?.location) {
                 setLat(found.location.lat.toString());
                 setLon(found.location.lon.toString());
@@ -46,14 +54,9 @@ export default function Home({ articles, filters, cities, tags }: HomeProps) {
         }
     }, [articles, city]);
 
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-        router.get('/', { q: query, tag, city, radius, lat, lon, page: newPage }, { preserveState: true, replace: true });
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Home" />
+            <Head title="Index" />
             <div className="flex flex-col gap-6 p-4">
                 <SearchFilters
                     q={query}
@@ -71,9 +74,37 @@ export default function Home({ articles, filters, cities, tags }: HomeProps) {
                     page={page}
                 />
 
-                <ArticlesTable articles={articles} />
+                <ArticlesTable articles={articles.data} />
 
-                {totalPages > 1 && <PaginationControls page={page} totalPages={totalPages} onChange={handlePageChange} />}
+                {(articles.prev_page_url || articles.next_page_url) && (
+                    <div className="mt-6">
+                        <Pagination className="justify-between">
+                            {articles.prev_page_url ? (
+                                <Button variant="outline" asChild>
+                                    <Link href={articles.prev_page_url}>Previous</Link>
+                                </Button>
+                            ) : (
+                                <Button variant="outline" disabled>
+                                    Previous
+                                </Button>
+                            )}
+
+                            <span className="text-muted-foreground text-sm">
+                                Page {articles.current_page} of {articles.last_page}
+                            </span>
+
+                            {articles.next_page_url ? (
+                                <Button variant="outline" asChild>
+                                    <Link href={articles.next_page_url}>Next</Link>
+                                </Button>
+                            ) : (
+                                <Button variant="outline" disabled>
+                                    Next
+                                </Button>
+                            )}
+                        </Pagination>
+                    </div>
+                )}
             </div>
         </AppLayout>
     );

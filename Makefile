@@ -38,6 +38,7 @@ setup-test-db:
 # Run tests
 test: setup-test-db
 	docker compose exec app php artisan test --env=testing
+	docker compose exec app php artisan dusk --env=testing
 
 # Run quality tools
 quality:

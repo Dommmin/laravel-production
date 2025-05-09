@@ -1,208 +1,168 @@
+import { MessageList } from '@/components/chat/message-list';
+import { UserList } from '@/components/chat/users-list';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useChatRealtime } from '@/hooks/use-chat-realtime';
 import AppLayout from '@/layouts/app-layout';
-import { Head, router, useForm, WhenVisible } from '@inertiajs/react';
+import type { Message, User } from '@/types';
+import { Head, router, useForm } from '@inertiajs/react';
 import React, { useEffect, useRef, useState } from 'react';
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
-
-interface Message {
-    id: number;
-    user_id: number;
-    recipient_id: number;
-    message: string;
-    created_at: string;
-}
 
 interface ChatProps {
     users: User[];
-    messages: {
-        data: Message[];
-    };
+    messages: Message[];
     currentUserId: number;
     recipient: User | null;
     messagesPagination: {
         current_page: number;
         last_page: number;
-    }
+    };
 }
 
-export default function Chat({ users, messages, currentUserId, recipient, messagesPagination }: ChatProps) {
-    const [selectedUser, setSelectedUser] = useState<User | null>(recipient);
+export default function Chat({ users, messages: initialMessages, currentUserId, recipient: initialRecipient, messagesPagination }: ChatProps) {
+    const selectedUser = initialRecipient;
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [initial, setInitial] = useState(true);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-    const { data, setData, post, reset, processing, errors } = useForm({
+    const { messages } = useChatRealtime({
+        initialMessages: initialMessages,
+        currentUserId,
+        selectedUserId: selectedUser?.id,
+    });
+
+    const { data, setData, post, reset, processing } = useForm({
         message: '',
-        recipient_id: selectedUser.id,
-    })
+        recipient_id: selectedUser?.id || 0,
+    });
 
     useEffect(() => {
-        if (!selectedUser.id) return;
+        inputRef.current?.focus();
+    }, [selectedUser?.id]);
 
-        window.Echo.private(`chat.${currentUserId}`).listen('MessageSent', (e: any) => {
-            if (
-                (e.user_id === selectedUser.id && e.recipient_id === currentUserId) ||
-                (e.user_id === currentUserId && e.recipient_id === selectedUser.id)
-            ) {
-                setMessages((prev) => [...prev, e]);
-            }
-        });
-        return () => {
-            window.Echo.leave(`chat.${currentUserId}`);
-        };
-    }, [selectedUser.id, currentUserId]);
-
-    // useEffect(() => {
-    //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    // }, [messages, selectedUser.id]);
-    //
-    // useEffect(() => {
-    //     inputRef.current?.focus();
-    // }, [selectedUser.id]);
+    useEffect(() => {
+        if (messages.length > 0) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+        }
+    }, [messages]);
 
     const changeRecipient = (user: User) => {
-        setSelectedUser(user);
-        setData('recipient_id', user.id);
-        router.reload({
-            only: ['messages'],
-            data: {
-                recipient_id: user.id,
-            },
+        router.visit(route('chat.index'), {
+            data: { recipient_id: user.id },
+            preserveState: true,
+            only: ['messages', 'messagesPagination', 'recipient'],
         });
-    }
+    };
 
     const sendMessage = () => {
-        if (!selectedUser.id || !data.message.trim()) return;
-        reset('message');
+        if (!selectedUser?.id || !data.message.trim()) return;
         setData('recipient_id', selectedUser.id);
-
         post(route('chat.send'), {
             preserveScroll: true,
-            onSuccess: (response) => {
-                    router.reload();
-                    inputRef.current?.focus();
-                },
-            onError: (errors) => {
-                console.log(errors);
-            }
+            onSuccess: () => {
+                reset('message');
+                inputRef.current?.focus();
+            },
         });
+    };
 
-        // form.post(route('chat.send'), {
-        //     preserveScroll: true,
-        //     onSuccess: (response) => {
-        //
-        //     },
-        //     onError: (errors) => {
-        //         console.log(errors);
-        //     },
-        // })
-    }
-
-    // const sendMessage = async (e: React.FormEvent | React.KeyboardEvent) => {
-    //     e.preventDefault?.();
-    //     if (!selectedUser || !message.trim()) return;
-    //     const tempMsg: Message = {
-    //         id: Date.now(), // tymczasowe id
-    //         user_id: currentUserId,
-    //         recipient_id: selectedUser.id,
-    //         message,
-    //         created_at: new Date().toISOString(),
-    //     };
-    //     setMessages((prev) => [...prev, tempMsg]); // optimistic update
-    //     setMessage('');
-    // };
-    //
     const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
             sendMessage();
         }
     };
 
-    const loadMore = () => {
+    // Funkcja pomocnicza do znalezienia id pierwszej widocznej wiadomości
+    const getFirstVisibleMessageId = () => {
+        const container = messagesContainerRef.current;
+        if (!container) return null;
+        const messageNodes = Array.from(container.querySelectorAll('[data-message-id]')) as HTMLElement[];
+        for (const node of messageNodes) {
+            const rect = node.getBoundingClientRect();
+            if (rect.top >= container.getBoundingClientRect().top) {
+                return node.dataset.messageId;
+            }
+        }
+        return null;
+    };
+
+    const scrollToMessageId = (id: string | null) => {
+        if (!id) return;
+        const container = messagesContainerRef.current;
+        const node = container?.querySelector(`[data-message-id="${id}"]`);
+        if (node && container) {
+            container.scrollTop = (node as HTMLElement).offsetTop - container.offsetTop;
+        }
+    };
+
+    const loadMoreMessages = () => {
+        if (messagesPagination.current_page >= messagesPagination.last_page) return;
+        const firstVisibleId = getFirstVisibleMessageId();
         router.reload({
             only: ['messages', 'messagesPagination'],
             data: {
+                recipient_id: selectedUser?.id,
                 page: messagesPagination.current_page + 1,
-            }
-        })
+            },
+            onSuccess: () => {
+                setTimeout(() => scrollToMessageId(firstVisibleId ?? null), 0);
+            },
+        });
+    };
+
+    if (!selectedUser) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Chat', href: '/chat' }]}>
+                <Head title="Chat" />
+                <div className="bg-background flex h-[80vh] overflow-hidden rounded border shadow dark:border-zinc-800">
+                    <UserList users={users as import('@/types').User[]} selectedUserId={0} onSelectUser={changeRecipient} />
+                    <div className="bg-background flex flex-1 items-center justify-center">
+                        <p className="text-muted-foreground">Select a user to start chatting</p>
+                    </div>
+                </div>
+            </AppLayout>
+        );
     }
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Chat', href: '/chat' }]}>
             <Head title="Chat" />
-            <div className="flex h-[80vh] overflow-hidden rounded border bg-background shadow dark:border-zinc-800">
-                <aside className="w-1/4 border-r bg-muted p-4 dark:border-zinc-800 dark:bg-zinc-900">
-                    <h2 className="mb-4 text-lg font-bold text-foreground">Użytkownicy</h2>
-                    <ul className="space-y-1">
-                        {users.map((user) => (
-                            <li key={user.id}>
-                                <button
-                                    className={`w-full rounded px-2 py-1 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 ${selectedUser.id === user.id ? 'bg-primary/10 font-bold text-primary dark:bg-primary/20' : 'hover:bg-accent/50'}`}
-                                    onClick={() => changeRecipient(user)}
-                                    tabIndex={0}
-                                >
-                                    {user.name}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </aside>
-                <main className="flex flex-1 flex-col bg-background">
-                    <div className="flex-1 space-y-2 overflow-y-auto bg-background p-4">
-                        {/*<Button onClick={loadMore} className="mb-2" variant="link" disabled={messagesPagination.current_page === messagesPagination.last_page}>Load more</Button>*/}
-                        {messages
-                            .filter(
-                                (msg) =>
-                                    (msg.user_id === currentUserId && msg.recipient_id === selectedUser.id) ||
-                                    (msg.user_id === selectedUser.id && msg.recipient_id === currentUserId),
-                            )
-                            .map((msg) => (
-                                <div
-                                    key={msg.id}
-                                    className={`max-w-[70%] rounded-lg px-4 py-2 text-sm shadow transition-all duration-200 ${msg.user_id === currentUserId ? 'ml-auto bg-primary text-primary-foreground' : 'mr-auto border bg-card text-card-foreground dark:border-zinc-800'}`}
-                                >
-                                    <div>{msg.message}</div>
-                                    <div className="mt-1 text-right text-xs text-muted-foreground">{new Date(msg.created_at).toLocaleTimeString()}</div>
-                                </div>
-                            ))}
-                        <WhenVisible
-                            always
-                            fallback={() => <div>Loading...</div>}
-                            params={{
-                                data: {
-                                    page: messagesPagination.current_page + 1,
-                                },
-                                only: ['messages', 'messagesPagination'],
-                            }}
-                        >
-                            {messagesPagination.current_page >= messagesPagination.last_page && (
-                                <div>You have reached the end.</div>
-                            )}
-                        </WhenVisible>
-                        <div ref={messagesEndRef} />
+            <div className="bg-background flex h-[80vh] overflow-hidden rounded border shadow dark:border-zinc-800">
+                <UserList users={users as import('@/types').User[]} selectedUserId={selectedUser.id} onSelectUser={changeRecipient} />
+                <main className="bg-background flex flex-1 flex-col">
+                    <div ref={messagesContainerRef} className="bg-background flex-1 space-y-2 overflow-y-auto p-4">
+                        <MessageList
+                            messages={messages}
+                            currentUserId={currentUserId}
+                            selectedUserId={selectedUser.id}
+                            pagination={messagesPagination}
+                            onLoadMore={loadMoreMessages}
+                            messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
+                        />
                     </div>
-                    {recipient && (
-                        <div className="flex border-t bg-background p-4 dark:border-zinc-800">
-                            <Input
-                                ref={inputRef}
-                                value={data.message}
-                                onChange={(e) => setData('message', e.target.value)}
-                                onKeyDown={handleInputKeyDown}
-                                placeholder={'Wiadomość do ' + selectedUser.name}
-                                className="mr-2 flex-1"
-                                autoComplete="off"
-                                disabled={!selectedUser}
-                            />
-                            <Button type="button" onClick={sendMessage} className="shrink" variant="default">
-                                Wyślij
-                            </Button>
-                        </div>
-                    )}
+                    <div className="bg-background flex border-t p-4 dark:border-zinc-800">
+                        <Input
+                            ref={inputRef}
+                            value={data.message}
+                            onChange={(e) => setData('message', e.target.value)}
+                            onKeyDown={handleInputKeyDown}
+                            placeholder={`Message do ${selectedUser.name}`}
+                            className="mr-2 flex-1"
+                            autoComplete="off"
+                            disabled={processing}
+                        />
+                        <Button
+                            type="button"
+                            onClick={sendMessage}
+                            className="shrink"
+                            variant="default"
+                            disabled={processing || !data.message.trim()}
+                        >
+                            Send
+                        </Button>
+                    </div>
                 </main>
             </div>
         </AppLayout>

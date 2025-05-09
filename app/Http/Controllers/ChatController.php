@@ -7,22 +7,43 @@ use App\Http\Requests\SendMessageRequest;
 use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 
 class ChatController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response|ResponseFactory
     {
         $recipientId = $request->input('recipient_id');
+        $page = $request->integer('page', 1);
+
         $users = User::getChatUsers();
         $recipient = $recipientId ? User::getRecipient($recipientId) : $users->first();
-        $messages = ChatMessage::getChatMessages($recipient?->id);
+        $messagesQuery = ChatMessage::getChatMessages($recipient->id ?? null, auth()->id());
+
+        $pagination = $messagesQuery->toArray();
+        unset($pagination['data']);
+
+        $messages = collect($messagesQuery->items())
+            ->sortBy('created_at')
+            ->values()
+            ->map(function ($msg) {
+                return [
+                    'id' => $msg->id,
+                    'user_id' => $msg->user_id,
+                    'recipient_id' => $msg->recipient_id,
+                    'message' => $msg->message,
+                    'created_at' => $msg->created_at?->toISOString(),
+                    'updated_at' => $msg->updated_at?->toISOString(),
+                ];
+            });
 
         return inertia('chat/index', [
             'users' => $users,
             'currentUserId' => auth()->id(),
             'recipient' => $recipient,
-            'messages' => inertia()->merge(fn () => $messages->items()),
-            'messagesPagination' => $messages->toArray(),
+            'messages' => $messages,
+            'messagesPagination' => $pagination,
         ]);
     }
 

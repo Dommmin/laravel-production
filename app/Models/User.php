@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -47,17 +48,37 @@ class User extends Authenticatable
         ];
     }
 
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'user_id');
+    }
+
+    /**
+     * Get the messages received by this user.
+     */
+    public function receivedMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'recipient_id');
+    }
+
+    /**
+     * Get all users available for chat (excluding the current user).
+     */
     public static function getChatUsers(): Collection
     {
         return self::query()
             ->where('id', '!=', auth()->id())
-            ->get();
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
     }
 
-    public static function getRecipient(?int $recipientId)
+    /**
+     * Get a specific recipient by ID.
+     */
+    public static function getRecipient(int $recipientId): ?User
     {
         return self::query()
             ->where('id', $recipientId)
-            ->first();
+            ->first(['id', 'name', 'email']);
     }
 }

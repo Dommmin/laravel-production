@@ -5,7 +5,7 @@ use App\Models\User;
 
 describe('ChatMessage model', function () {
     it('has fillable fields', function () {
-        $model = new ChatMessage();
+        $model = new ChatMessage;
         expect($model->getFillable())->toBe(['user_id', 'recipient_id', 'message']);
     });
 
@@ -15,7 +15,7 @@ describe('ChatMessage model', function () {
         $msg = ChatMessage::create([
             'user_id' => $user->id,
             'recipient_id' => $recipient->id,
-            'message' => 'Hello!'
+            'message' => 'Hello!',
         ]);
         expect($msg->user_id)->toBe($user->id);
         expect($msg->recipient_id)->toBe($recipient->id);
@@ -28,7 +28,7 @@ describe('ChatMessage model', function () {
         $msg = ChatMessage::create([
             'user_id' => $user->id,
             'recipient_id' => $recipient->id,
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
         expect($msg->user->id)->toBe($user->id);
         expect($msg->recipient->id)->toBe($recipient->id);

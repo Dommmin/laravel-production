@@ -17,13 +17,13 @@ class SendMessageRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            'recipient_id' => 'required|exists:users,id',
-            'message' => 'required|string|max:1000',
+            'recipient_id' => ['required', 'integer', 'exists:users,id'],
+            'message' => ['required', 'string', 'max:1000'],
         ];
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-use App\Models\User;
-use App\Models\ChatMessage;
-use Illuminate\Support\Facades\Event;
 use App\Events\MessageSent;
+use App\Models\User;
+use Illuminate\Support\Facades\Event;
 
 describe('Chat feature', function () {
     it('requires authentication to access chat', function () {
@@ -35,12 +34,12 @@ describe('Chat feature', function () {
         $this->actingAs($user)
             ->postJson('/chat/send', [
                 'recipient_id' => $recipient->id,
-                'message' => 'Cześć!'
+                'message' => 'Cześć!',
             ])->assertOk();
         $this->assertDatabaseHas('chat_messages', [
             'user_id' => $user->id,
             'recipient_id' => $recipient->id,
-            'message' => 'Cześć!'
+            'message' => 'Cześć!',
         ]);
         Event::assertDispatched(MessageSent::class);
     });

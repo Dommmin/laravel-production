@@ -74,3 +74,12 @@ interface FiltersProps {
     lon: string;
     page: number;
 }
+
+interface Message {
+    id: number;
+    user_id: number;
+    recipient_id: number;
+    message: string;
+    created_at: string;
+    updated_at: string;
+}

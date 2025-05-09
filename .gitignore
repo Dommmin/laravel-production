@@ -37,3 +37,5 @@ docker/local/nginx/log/
 
 .composer/
 /.cursor/
+
+.pki/nssdb/

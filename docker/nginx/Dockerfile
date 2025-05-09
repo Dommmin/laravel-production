@@ -11,6 +11,9 @@ COPY vite.config.ts tsconfig.json ./
 COPY resources resources
 COPY public public
 
+# Copy the rest of the application (including new/removed files)
+COPY . .
+
 RUN npm run build
 
 FROM nginx:stable-alpine

@@ -1,4 +1,4 @@
-.PHONY: up down build install migrate fresh test setup-test-db
+.PHONY: up down build install migrate fresh test setup-test-db dusk dusk-up help
 
 # Start the application
 up:
@@ -36,9 +36,12 @@ setup-test-db:
 	docker compose exec app php artisan migrate --env=testing
 
 # Run tests
-test: setup-test-db
+test:
 	docker compose exec app php artisan test --env=testing
-	docker compose exec app php artisan dusk --env=testing
+
+# Run dusk browser tests
+dusk:
+	docker compose exec app php artisan dusk
 
 # Run quality tools
 quality:
@@ -74,3 +77,9 @@ clear:
 # Start Vite development server
 vite:
 	docker compose exec app npm run dev
+
+# Help target
+help:
+	@echo "make test    - run all Pest (unit/feature) tests in Docker"
+	@echo "make dusk-up - start ChromeDriver in Docker (required for Dusk browser tests)"
+	@echo "make dusk    - run all Dusk browser tests in Docker (after dusk-up)"

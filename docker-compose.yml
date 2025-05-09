@@ -26,6 +26,8 @@ services:
                 condition: service_healthy
             redis:
                 condition: service_healthy
+            selenium:
+                condition: service_healthy
 
     nginx:
         image: nginx:alpine
@@ -136,6 +138,22 @@ services:
         networks:
             - laravel-network
 
+    selenium:
+        image: selenium/standalone-chrome:4.21.0
+        container_name: ${COMPOSE_PROJECT_NAME}_selenium
+        volumes:
+            - /dev/shm:/dev/shm
+        ports:
+            - "4444:4444"
+            - "7900:7900"
+        networks:
+            - laravel-network
+        healthcheck:
+            test: curl --fail http://localhost:4444/status || exit 1
+            interval: 5s
+            retries: 5
+            start_period: 10s
+
 networks:
     laravel-network:
         driver: bridge
@@ -146,4 +164,6 @@ volumes:
     mailhog_data:
         driver: local
     esdata:
+        driver: local
+    redis_data:
         driver: local

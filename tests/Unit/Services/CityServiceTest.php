@@ -18,8 +18,8 @@ class CityServiceTest extends TestCase
     public function test_get_available_cities_returns_cities()
     {
         $mock = Mockery::mock('alias:'.Article::class);
-        $mock->shouldReceive('query->distinct->pluck->all')->andReturn(['Warszawa', 'Kraków']);
+        $mock->shouldReceive('query->distinct->pluck->all')->andReturn(['London', 'New York']);
         $service = new CityService;
-        $this->assertEquals(['Warszawa', 'Kraków'], $service->getAvailableCities());
+        $this->assertEquals(['London', 'New York'], $service->getAvailableCities());
     }
 }

@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Tag;
 
 /**
- * Serwis do pobierania dostępnych tagów z bazy
+ * Service for retrieving available tags from the database
  */
 class TagService
 {

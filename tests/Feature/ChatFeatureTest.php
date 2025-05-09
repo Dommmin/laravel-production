@@ -28,18 +28,19 @@ describe('Chat feature', function () {
     });
 
     it('sends a message and broadcasts event', function () {
+        $this->withoutExceptionHandling();
         Event::fake([MessageSent::class]);
         $user = User::factory()->create();
         $recipient = User::factory()->create();
         $this->actingAs($user)
             ->postJson('/chat/send', [
                 'recipient_id' => $recipient->id,
-                'message' => 'Cześć!',
-            ])->assertOk();
+                'message' => 'Hello!',
+            ])->assertRedirectToRoute('chat.index');
         $this->assertDatabaseHas('chat_messages', [
             'user_id' => $user->id,
             'recipient_id' => $recipient->id,
-            'message' => 'Cześć!',
+            'message' => 'Hello!',
         ]);
         Event::assertDispatched(MessageSent::class);
     });

@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Article;
 
 /**
- * Serwis do pobierania dostępnych miast z artykułów
+ * Service for retrieving available cities from articles
  */
 class CityService
 {

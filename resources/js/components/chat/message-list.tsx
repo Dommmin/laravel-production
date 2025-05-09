@@ -16,7 +16,7 @@ interface MessageListProps {
 }
 
 export const MessageList: React.FC<MessageListProps> = ({ messages, currentUserId, selectedUserId, pagination, onLoadMore, messagesEndRef }) => {
-    // Sortuj rosnąco po created_at (najstarsze na górze, najnowsze na dole)
+    // Sort ascending by created_at (oldest at the top, newest at the bottom)
     const conversationMessages = messages
         .filter(
             (msg) =>
@@ -46,7 +46,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, currentUserI
                     only: ['messages', 'messagesPagination'],
                 }}
             >
-                {/* pusty children, wymagany przez typy */}
+                {/* empty children, required by types */}
                 <></>
             </WhenVisible>
 

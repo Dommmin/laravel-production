@@ -13,9 +13,9 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         $cities = [
-            ['name' => 'Warszawa', 'lat' => 52.2297, 'lon' => 21.0122],
-            ['name' => 'Kraków', 'lat' => 50.0647, 'lon' => 19.9450],
-            ['name' => 'Wrocław', 'lat' => 51.1079, 'lon' => 17.0385],
+            ['name' => 'London', 'lat' => 52.2297, 'lon' => 21.0122],
+            ['name' => 'New York', 'lat' => 50.0647, 'lon' => 19.9450],
+            ['name' => 'Berlin', 'lat' => 51.1079, 'lon' => 17.0385],
         ];
         $city = $this->faker->randomElement($cities);
 

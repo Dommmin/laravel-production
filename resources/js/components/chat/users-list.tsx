@@ -10,7 +10,7 @@ interface UserListProps {
 export const UserList: React.FC<UserListProps> = ({ users, selectedUserId, onSelectUser }) => {
     return (
         <aside className="bg-muted w-1/4 border-r p-4 dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-foreground mb-4 text-lg font-bold">Użytkownicy</h2>
+            <h2 className="text-foreground mb-4 text-lg font-bold">Users</h2>
             <ul className="space-y-1">
                 {users.map((user) => (
                     <li key={user.id}>

@@ -2,6 +2,9 @@
 
 use App\Models\ChatMessage;
 use App\Models\User;
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 describe('ChatMessage model', function () {
     it('has fillable fields', function () {
@@ -17,9 +20,10 @@ describe('ChatMessage model', function () {
             'recipient_id' => $recipient->id,
             'message' => 'Hello!',
         ]);
-        expect($msg->user_id)->toBe($user->id);
-        expect($msg->recipient_id)->toBe($recipient->id);
-        expect($msg->message)->toBe('Hello!');
+
+        expect($msg->user_id)->toBe($user->id)
+            ->and($msg->recipient_id)->toBe($recipient->id)
+            ->and($msg->message)->toBe('Hello!');
     });
 
     it('has user and recipient relations', function () {
@@ -30,7 +34,8 @@ describe('ChatMessage model', function () {
             'recipient_id' => $recipient->id,
             'message' => 'Test',
         ]);
-        expect($msg->user->id)->toBe($user->id);
-        expect($msg->recipient->id)->toBe($recipient->id);
+
+        expect($msg->user->id)->toBe($user->id)
+            ->and($msg->recipient->id)->toBe($recipient->id);
     });
 });

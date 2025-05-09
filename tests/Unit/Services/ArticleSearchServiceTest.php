@@ -25,7 +25,7 @@ class ArticleSearchServiceTest extends TestCase
                     ['_source' => [
                         'title' => 'Test title',
                         'tags' => ['laravel'],
-                        'city_name' => 'Warszawa',
+                        'city_name' => 'London',
                     ]],
                 ],
                 'total' => ['value' => 1],
@@ -52,7 +52,7 @@ class ArticleSearchServiceTest extends TestCase
                     ['_source' => [
                         'title' => 'Artykuł Laravel',
                         'tags' => ['laravel'],
-                        'city_name' => 'Warszawa',
+                        'city_name' => 'London',
                     ]],
                 ],
                 'total' => ['value' => 1],
@@ -74,9 +74,9 @@ class ArticleSearchServiceTest extends TestCase
             'hits' => [
                 'hits' => [
                     ['_source' => [
-                        'title' => 'Artykuł z Krakowa',
+                        'title' => 'Artykuł z New York',
                         'tags' => ['php'],
-                        'city_name' => 'Kraków',
+                        'city_name' => 'New York',
                     ]],
                 ],
                 'total' => ['value' => 1],
@@ -85,10 +85,10 @@ class ArticleSearchServiceTest extends TestCase
         $mockEs = Mockery::mock(ElasticsearchService::class);
         $mockEs->shouldReceive('client')->andReturn($mockClient);
         $service = new ArticleSearchService($mockEs);
-        $filters = new ArticleFilterData(city: 'Kraków');
+        $filters = new ArticleFilterData(city: 'New York');
         $result = $service->search($filters);
         $this->assertCount(1, $result['articles']);
-        $this->assertEquals('Kraków', $result['articles'][0]['city_name']);
+        $this->assertEquals('New York', $result['articles'][0]['city_name']);
     }
 
     public function test_geo_search_returns_city_within_radius()
@@ -98,9 +98,9 @@ class ArticleSearchServiceTest extends TestCase
             'hits' => [
                 'hits' => [
                     ['_source' => [
-                        'title' => 'Artykuł z Krakowa',
+                        'title' => 'Artykuł z New York',
                         'tags' => ['php'],
-                        'city_name' => 'Kraków',
+                        'city_name' => 'New York',
                         'location' => ['lat' => 50.0647, 'lon' => 19.9450],
                     ]],
                 ],
@@ -113,6 +113,6 @@ class ArticleSearchServiceTest extends TestCase
         $filters = new ArticleFilterData(lat: 51.1079, lon: 17.0385, radius: 300);
         $result = $service->search($filters);
         $this->assertCount(1, $result['articles']);
-        $this->assertEquals('Kraków', $result['articles'][0]['city_name']);
+        $this->assertEquals('New York', $result['articles'][0]['city_name']);
     }
 }

@@ -59,6 +59,6 @@ class ChatController extends Controller
 
         broadcast(new MessageSent($message))->toOthers();
 
-        return back()->with('success', 'Message sent successfully.');
+        return to_route('chat.index')->with('success', 'Message sent successfully.');
     }
 }

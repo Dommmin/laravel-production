@@ -74,7 +74,7 @@ export default function Chat({ users, messages: initialMessages, currentUserId, 
         }
     };
 
-    // Funkcja pomocnicza do znalezienia id pierwszej widocznej wiadomości
+    // Helper function to find the id of the first visible message
     const getFirstVisibleMessageId = () => {
         const container = messagesContainerRef.current;
         if (!container) return null;

@@ -62,8 +62,9 @@ export const useChatRealtime = ({ initialMessages, currentUserId, selectedUserId
                         return prevMessages;
                     }
 
-                    // Add new message to the end (newest messages are at the end)
-                    return [...prevMessages, event];
+                    // Map Echo event to Message type (add updated_at)
+                    const message = { ...event, updated_at: '' };
+                    return [...prevMessages, message];
                 });
             }
         });

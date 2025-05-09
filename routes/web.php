@@ -31,9 +31,11 @@ Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('art
 Route::get('/articles/{article}/similar', [ArticleController::class, 'similar'])->name('articles.similar');
 Route::get('/articles/aggregation/cities', [ArticleController::class, 'cityAggregation'])->name('articles.aggregation.cities');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-    Route::post('/chat/send', [ChatController::class, 'store'])->name('chat.send');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{chat}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{chat}', [\App\Http\Controllers\ChatController::class, 'store'])->name('chat.send');
+    Route::post('/chat/find-or-create/{user}', [\App\Http\Controllers\ChatController::class, 'findOrCreate'])->name('chat.findOrCreate');
 });
 
 require __DIR__.'/settings.php';

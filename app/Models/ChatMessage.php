@@ -12,10 +12,16 @@ class ChatMessage extends Model
     use HasFactory;
 
     protected $fillable = [
+        'chat_id',
         'user_id',
-        'recipient_id',
         'message',
+        'read_at',
     ];
+
+    public function chat(): BelongsTo
+    {
+        return $this->belongsTo(Chat::class);
+    }
 
     public function user(): BelongsTo
     {
@@ -24,25 +30,16 @@ class ChatMessage extends Model
 
     public function recipient(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'recipient_id');
+        // Usuwamy recipient, niepotrzebne
     }
 
     public static function getChatMessages(?int $recipientId, ?int $userId = null, int $perPage = 15)
     {
-        if (! $recipientId || ! $userId) {
-            return new LengthAwarePaginator([], 0, $perPage);
-        }
+        // Usuwamy, niepotrzebne
+    }
 
-        return self::query()
-            ->where(function ($query) use ($userId, $recipientId) {
-                $query->where('user_id', $userId)
-                    ->where('recipient_id', $recipientId);
-            })
-            ->orWhere(function ($query) use ($userId, $recipientId) {
-                $query->where('user_id', $recipientId)
-                    ->where('recipient_id', $userId);
-            })
-            ->latest('created_at')
-            ->paginate($perPage);
+    public function readBy()
+    {
+        return $this->belongsToMany(User::class, 'chat_message_reads')->withTimestamps();
     }
 }

@@ -48,17 +48,14 @@ class User extends Authenticatable
         ];
     }
 
-    public function sentMessages(): HasMany
+    public function chats(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->hasMany(ChatMessage::class, 'user_id');
+        return $this->belongsToMany(Chat::class, 'chat_users');
     }
 
-    /**
-     * Get the messages received by this user.
-     */
-    public function receivedMessages(): HasMany
+    public function messages(): HasMany
     {
-        return $this->hasMany(ChatMessage::class, 'recipient_id');
+        return $this->hasMany(ChatMessage::class, 'user_id');
     }
 
     /**

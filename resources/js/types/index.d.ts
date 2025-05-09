@@ -75,11 +75,19 @@ interface FiltersProps {
     page: number;
 }
 
-interface Message {
+export interface Message {
     id: number;
+    chat_id: string;
     user_id: number;
-    recipient_id: number;
     message: string;
     created_at: string;
     updated_at: string;
+    read_by: number[];
+    user: User;
+}
+
+export interface Chat {
+    id: string;
+    name?: string;
+    users: User[];
 }

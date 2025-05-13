@@ -6,6 +6,7 @@ use App\Http\Controllers\FileController;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PdfDemoController;
 
 // Health check endpoint
 Route::get('/up', function () {
@@ -36,6 +37,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat/{chat}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{chat}', [ChatController::class, 'store'])->name('chat.send');
 });
+
+Route::get('/pdf/spatie', [PdfDemoController::class, 'spatie'])->name('pdf.spatie');
+Route::get('/pdf/dompdf', [PdfDemoController::class, 'dompdf'])->name('pdf.dompdf');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

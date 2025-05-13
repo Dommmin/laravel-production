@@ -1,45 +1,19 @@
-import { Button } from '@/components/ui/button';
 import { type Message } from '@/types';
-import { WhenVisible } from '@inertiajs/react';
 import React from 'react';
 
 interface MessageListProps {
     messages: Message[];
     currentUserId: number;
     selectedUserId: number;
-    pagination: {
-        current_page: number;
-        last_page: number;
-    };
-    onLoadMore: () => void;
     messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
-export const MessageList: React.FC<MessageListProps> = ({ messages, currentUserId, selectedUserId, pagination, onLoadMore, messagesEndRef }) => {
-    // Sort ascending by created_at (oldest at the top, newest at the bottom)
+export const MessageList: React.FC<MessageListProps> = ({ messages, currentUserId, messagesEndRef }) => {
     const conversationMessages = messages
         .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
-    const hasMoreMessages = pagination.current_page < pagination.last_page;
-
     return (
         <div className="bg-background flex-1 space-y-2 overflow-y-auto p-4">
-            {hasMoreMessages && (
-                <div className="text-center">
-                    <Button onClick={onLoadMore} className="mb-2" variant="outline" size="sm">
-                        Load more messages
-                    </Button>
-                </div>
-            )}
-            <WhenVisible
-                fallback="Loading older messages..."
-                params={{
-                }}
-            >
-                {/* empty children, required by types */}
-                <></>
-            </WhenVisible>
-
             {conversationMessages.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                     <p className="text-muted-foreground">No messages yet. Start a conversation!</p>
@@ -47,7 +21,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, currentUserI
             ) : (
                 conversationMessages.map((msg, idx) => {
                     const isMine = msg.user_id === currentUserId;
-                    const isLastRead = msg.read_by.includes(currentUserId) &&
+                    const isLastRead = msg.read_by && msg.read_by.includes(currentUserId) &&
                         (idx === conversationMessages.length - 1 || !conversationMessages[idx + 1].read_by.includes(currentUserId));
                     return (
                         <div

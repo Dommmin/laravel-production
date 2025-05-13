@@ -4,26 +4,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import type { Message, User, Chat } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import React, { useEffect, useRef } from 'react';
 
 interface ChatShowProps {
     chat: Chat;
-    users: User[];
+    chats: Chat[];
     currentUserId: number;
     messages: Message[];
-    messagesPagination: {
-        current_page: number;
-        last_page: number;
-    };
 }
 
-export default function ChatShow({ chat, users, currentUserId, messages, messagesPagination }: ChatShowProps) {
+export default function ChatShow({ chat, chats, currentUserId, messages }: ChatShowProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const { data, setData, post, reset, processing } = useForm({
         message: '',
     });
+
+    const otherUser = chat.users.find((u: User) => u.id !== currentUserId);
+    const selectedUserId = otherUser ? otherUser.id : 0;
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -53,30 +52,17 @@ export default function ChatShow({ chat, users, currentUserId, messages, message
         }
     };
 
-    // Funkcja do ładowania kolejnych stron bez page/recipient_id w URL
-    const loadMoreMessages = () => {
-        if (messagesPagination.current_page >= messagesPagination.last_page) return;
-        router.reload({
-            only: ['messages', 'messagesPagination'],
-            data: {}, // nie przekazujemy page ani recipient_id
-            preserveState: true,
-            replace: true,
-        });
-    };
-
     return (
-        <AppLayout breadcrumbs={[{ title: 'Chat', href: '/chat' }]}> 
+        <AppLayout breadcrumbs={[{ title: 'Chat', href: '/chat' }]}>
             <Head title={chat.name || 'Chat'} />
             <div className="bg-background flex h-[80vh] overflow-hidden rounded border shadow dark:border-zinc-800">
-                <UserList users={users} selectedUserId={currentUserId} onSelectUser={() => router.visit('/chat')} />
+                <UserList chats={chats} />
                 <main className="bg-background flex flex-1 flex-col">
                     <div className="bg-background flex-1 space-y-2 overflow-y-auto p-4">
                         <MessageList
                             messages={messages}
                             currentUserId={currentUserId}
-                            selectedUserId={currentUserId}
-                            pagination={messagesPagination}
-                            onLoadMore={loadMoreMessages}
+                            selectedUserId={selectedUserId}
                             messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
                         />
                     </div>
@@ -105,4 +91,4 @@ export default function ChatShow({ chat, users, currentUserId, messages, message
             </div>
         </AppLayout>
     );
-} 
+}

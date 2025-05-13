@@ -39,4 +39,22 @@ class Chat extends Model
     {
         return $this->hasMany(ChatMessage::class);
     }
-} 
+
+    public static function getList()
+    {
+        return Chat::query()
+            ->with(['users' => function ($query) {
+                $query->where('user_id', '!=', auth()->id());
+            }, 'messages' => function ($query) {
+                $query->latest()->take(1);
+            }])
+            ->get()
+            ->map(function (Chat $chat) {
+                $chat->name = $chat->name ?: $chat->users->map(function (User $user) {
+                    return $user->name;
+                })->implode(', ');
+
+                return $chat;
+            });
+    }
+}

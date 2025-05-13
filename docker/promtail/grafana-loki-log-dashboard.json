@@ -1,0 +1,49 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Laravel/Nginx/PHP-FPM Logs (Loki)",
+    "tags": ["loki", "logs", "laravel", "nginx", "php-fpm"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "logs",
+        "title": "Ostatnie logi Laravel",
+        "datasource": "Loki",
+        "targets": [
+          { "expr": "{job=\"laravel\"}" }
+        ],
+        "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 }
+      },
+      {
+        "type": "timeseries",
+        "title": "Liczba błędów w logach Laravel (error)",
+        "datasource": "Loki",
+        "targets": [
+          { "expr": "count_over_time({job=\"laravel\"} |= \"error\" [1m])" }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 }
+      },
+      {
+        "type": "timeseries",
+        "title": "Liczba błędów 500 w logach Nginx",
+        "datasource": "Loki",
+        "targets": [
+          { "expr": "count_over_time({job=\"nginx\"} |= \" 500 \" [1m])" }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 }
+      },
+      {
+        "type": "logs",
+        "title": "Ostatnie logi PHP-FPM",
+        "datasource": "Loki",
+        "targets": [
+          { "expr": "{job=\"php-fpm\"}" }
+        ],
+        "gridPos": { "h": 10, "w": 24, "x": 0, "y": 18 }
+      }
+    ]
+  }
+} 

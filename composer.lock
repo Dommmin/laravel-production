@@ -1774,20 +1774,21 @@
         },
         {
             "name": "elastic/transport",
-            "version": "v9.0.0",
+            "version": "v9.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elastic/elastic-transport-php.git",
-                "reference": "d7d445e89f873e727d894a0d4f071c84a26861ce"
+                "reference": "3488b9d070e220f2a1ebdb500e6c588069f1897f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elastic/elastic-transport-php/zipball/d7d445e89f873e727d894a0d4f071c84a26861ce",
-                "reference": "d7d445e89f873e727d894a0d4f071c84a26861ce",
+                "url": "https://api.github.com/repos/elastic/elastic-transport-php/zipball/3488b9d070e220f2a1ebdb500e6c588069f1897f",
+                "reference": "3488b9d070e220f2a1ebdb500e6c588069f1897f",
                 "shasum": ""
             },
             "require": {
                 "composer-runtime-api": "^2.0",
+                "nyholm/psr7": "^1.8",
                 "open-telemetry/api": "^1.0",
                 "php": "^8.1",
                 "php-http/discovery": "^1.14",
@@ -1798,7 +1799,6 @@
                 "psr/log": "^2.0 || ^3.0"
             },
             "require-dev": {
-                "nyholm/psr7": "^1.8",
                 "open-telemetry/sdk": "^1.0",
                 "php-http/mock-client": "^1.5",
                 "phpstan/phpstan": "^2.1",
@@ -1826,9 +1826,9 @@
             ],
             "support": {
                 "issues": "https://github.com/elastic/elastic-transport-php/issues",
-                "source": "https://github.com/elastic/elastic-transport-php/tree/v9.0.0"
+                "source": "https://github.com/elastic/elastic-transport-php/tree/v9.0.1"
             },
-            "time": "2025-04-10T09:56:09+00:00"
+            "time": "2025-05-08T12:31:50+00:00"
         },
         {
             "name": "elasticsearch/elasticsearch",
@@ -2822,16 +2822,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.31.2",
+            "version": "v5.32.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "e6068c65be6c02a01e34531abf3143fab91f0de0"
+                "reference": "7686a8e1996472cc341dfd6f1d437065698594ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/e6068c65be6c02a01e34531abf3143fab91f0de0",
-                "reference": "e6068c65be6c02a01e34531abf3143fab91f0de0",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/7686a8e1996472cc341dfd6f1d437065698594ad",
+                "reference": "7686a8e1996472cc341dfd6f1d437065698594ad",
                 "shasum": ""
             },
             "require": {
@@ -2896,9 +2896,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.31.2"
+                "source": "https://github.com/laravel/horizon/tree/v5.32.0"
             },
-            "time": "2025-04-18T12:57:39+00:00"
+            "time": "2025-05-09T14:58:32+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -4289,17 +4289,95 @@
             "time": "2025-05-08T08:14:37+00:00"
         },
         {
-            "name": "open-telemetry/api",
-            "version": "1.2.3",
+            "name": "nyholm/psr7",
+            "version": "1.8.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/opentelemetry-php/api.git",
-                "reference": "199d7ddda88f5f5619fa73463f1a5a7149ccd1f1"
+                "url": "https://github.com/Nyholm/psr7.git",
+                "reference": "a71f2b11690f4b24d099d6b16690a90ae14fc6f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/opentelemetry-php/api/zipball/199d7ddda88f5f5619fa73463f1a5a7149ccd1f1",
-                "reference": "199d7ddda88f5f5619fa73463f1a5a7149ccd1f1",
+                "url": "https://api.github.com/repos/Nyholm/psr7/zipball/a71f2b11690f4b24d099d6b16690a90ae14fc6f3",
+                "reference": "a71f2b11690f4b24d099d6b16690a90ae14fc6f3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.1 || ^2.0"
+            },
+            "provide": {
+                "php-http/message-factory-implementation": "1.0",
+                "psr/http-factory-implementation": "1.0",
+                "psr/http-message-implementation": "1.0"
+            },
+            "require-dev": {
+                "http-interop/http-factory-tests": "^0.9",
+                "php-http/message-factory": "^1.0",
+                "php-http/psr7-integration-tests": "^1.0",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.4",
+                "symfony/error-handler": "^4.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Nyholm\\Psr7\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tobias Nyholm",
+                    "email": "tobias.nyholm@gmail.com"
+                },
+                {
+                    "name": "Martijn van der Ven",
+                    "email": "martijn@vanderven.se"
+                }
+            ],
+            "description": "A fast PHP7 implementation of PSR-7",
+            "homepage": "https://tnyholm.se",
+            "keywords": [
+                "psr-17",
+                "psr-7"
+            ],
+            "support": {
+                "issues": "https://github.com/Nyholm/psr7/issues",
+                "source": "https://github.com/Nyholm/psr7/tree/1.8.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Zegnat",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nyholm",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-09-09T07:06:30+00:00"
+        },
+        {
+            "name": "open-telemetry/api",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/opentelemetry-php/api.git",
+                "reference": "4e3bb38e069876fb73c2ce85c89583bf2b28cd86"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/opentelemetry-php/api/zipball/4e3bb38e069876fb73c2ce85c89583bf2b28cd86",
+                "reference": "4e3bb38e069876fb73c2ce85c89583bf2b28cd86",
                 "shasum": ""
             },
             "require": {
@@ -4356,7 +4434,7 @@
                 "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
                 "source": "https://github.com/open-telemetry/opentelemetry-php"
             },
-            "time": "2025-03-05T21:42:54+00:00"
+            "time": "2025-05-07T12:32:21+00:00"
         },
         {
             "name": "open-telemetry/context",
@@ -10826,16 +10904,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.42.0",
+            "version": "v1.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "2edaaf77f3c07a4099965bb3d7dfee16e801c0f6"
+                "reference": "71a509b14b2621ce58574274a74290f933c687f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/2edaaf77f3c07a4099965bb3d7dfee16e801c0f6",
-                "reference": "2edaaf77f3c07a4099965bb3d7dfee16e801c0f6",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/71a509b14b2621ce58574274a74290f933c687f7",
+                "reference": "71a509b14b2621ce58574274a74290f933c687f7",
                 "shasum": ""
             },
             "require": {
@@ -10885,7 +10963,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2025-04-29T14:26:46+00:00"
+            "time": "2025-05-13T13:34:34+00:00"
         },
         {
             "name": "mockery/mockery",

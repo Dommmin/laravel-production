@@ -7,6 +7,7 @@ use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfDemoController;
+use App\Http\Controllers\ContactController;
 
 // Health check endpoint
 Route::get('/up', function () {
@@ -40,6 +41,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/pdf/spatie', [PdfDemoController::class, 'spatie'])->name('pdf.spatie');
 Route::get('/pdf/dompdf', [PdfDemoController::class, 'dompdf'])->name('pdf.dompdf');
+
+Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
+Route::post('/contacts/import', [ContactController::class, 'import'])->name('contacts.import');
+Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,39 +13,39 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chats', function (Blueprint $table) {
-            $table->string('id')->primary(); // uuid
-            $table->string('name')->nullable();
-            $table->timestamps();
+        Schema::create('chats', function (Blueprint $blueprint): void {
+            $blueprint->string('id')->primary(); // uuid
+            $blueprint->string('name')->nullable();
+            $blueprint->timestamps();
         });
 
-        Schema::create('chat_messages', function (Blueprint $table) {
-            $table->id();
-            $table->string('chat_id');
-            $table->unsignedBigInteger('user_id');
-            $table->text('message');
-            $table->timestamp('read_at')->nullable();
-            $table->timestamps();
+        Schema::create('chat_messages', function (Blueprint $blueprint): void {
+            $blueprint->id();
+            $blueprint->string('chat_id');
+            $blueprint->unsignedBigInteger('user_id');
+            $blueprint->text('message');
+            $blueprint->timestamp('read_at')->nullable();
+            $blueprint->timestamps();
 
-            $table->foreign('chat_id')->references('id')->on('chats')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $blueprint->foreign('chat_id')->references('id')->on('chats')->onDelete('cascade');
+            $blueprint->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
-        Schema::create('chat_users', function (Blueprint $table) {
-            $table->string('chat_id');
-            $table->unsignedBigInteger('user_id');
-            $table->primary(['chat_id', 'user_id']);
-            $table->foreign('chat_id')->references('id')->on('chats')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        Schema::create('chat_users', function (Blueprint $blueprint): void {
+            $blueprint->string('chat_id');
+            $blueprint->unsignedBigInteger('user_id');
+            $blueprint->primary(['chat_id', 'user_id']);
+            $blueprint->foreign('chat_id')->references('id')->on('chats')->onDelete('cascade');
+            $blueprint->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
-        Schema::create('chat_message_reads', function (Blueprint $table) {
-            $table->unsignedBigInteger('chat_message_id');
-            $table->unsignedBigInteger('user_id');
-            $table->timestamps();
-            $table->primary(['chat_message_id', 'user_id']);
-            $table->foreign('chat_message_id')->references('id')->on('chat_messages')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        Schema::create('chat_message_reads', function (Blueprint $blueprint): void {
+            $blueprint->unsignedBigInteger('chat_message_id');
+            $blueprint->unsignedBigInteger('user_id');
+            $blueprint->timestamps();
+            $blueprint->primary(['chat_message_id', 'user_id']);
+            $blueprint->foreign('chat_message_id')->references('id')->on('chat_messages')->onDelete('cascade');
+            $blueprint->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

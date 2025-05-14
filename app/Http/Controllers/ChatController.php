@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
@@ -29,11 +31,11 @@ class ChatController extends Controller
         ]);
     }
 
-    public function store(StoreMessageRequest $request, Chat $chat)
+    public function store(StoreMessageRequest $storeMessageRequest, Chat $chat)
     {
-        $message = $chat->messages()->create($request->validated());
+        $model = $chat->messages()->create($storeMessageRequest->validated());
 
-        broadcast(new MessageSent($message))->toOthers();
+        broadcast(new MessageSent($model))->toOthers();
 
         return to_route('chat.show', $chat->id)->with('success', 'Message sent successfully.');
     }

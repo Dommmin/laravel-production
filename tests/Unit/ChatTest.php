@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\ChatMessage;
 use App\Models\User;
 use Tests\TestCase;
 
 uses(TestCase::class);
 
-describe('ChatMessage model', function () {
-    it('has fillable fields', function () {
+describe('ChatMessage model', function (): void {
+    it('has fillable fields', function (): void {
         $model = new ChatMessage;
         expect($model->getFillable())->toBe(['user_id', 'recipient_id', 'message']);
     });
 
-    it('can create a chat message', function () {
+    it('can create a chat message', function (): void {
         $user = User::factory()->create();
         $recipient = User::factory()->create();
         $msg = ChatMessage::create([
@@ -26,7 +28,7 @@ describe('ChatMessage model', function () {
             ->and($msg->message)->toBe('Hello!');
     });
 
-    it('has user and recipient relations', function () {
+    it('has user and recipient relations', function (): void {
         $user = User::factory()->create();
         $recipient = User::factory()->create();
         $msg = ChatMessage::create([

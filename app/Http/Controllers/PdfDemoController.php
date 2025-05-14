@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as DomPdf;
 use Spatie\Browsershot\Browsershot;
@@ -9,7 +12,7 @@ use Spatie\LaravelPdf\Facades\Pdf;
 
 class PdfDemoController extends Controller
 {
-    public function spatie(Request $request)
+    public function spatie(Request $request): Pdf
     {
         $data = [
             'user' => [
@@ -24,13 +27,13 @@ class PdfDemoController extends Controller
         ];
 
         return Pdf::view('pdfs.spatie-invoice', $data)
-            ->withBrowsershot(function (Browsershot $browsershot) {
+            ->withBrowsershot(function (Browsershot $browsershot): void {
                 $browsershot->noSandbox()->format('A4');
             })
             ->download('spatie-invoice.pdf');
     }
 
-    public function dompdf(Request $request)
+    public function dompdf(Request $request): Response
     {
         $data = [
             'invoice_number' => 'FV/2024/05/001',

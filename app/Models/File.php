@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,8 +19,10 @@ class File extends Model
 
     protected $appends = ['url'];
 
-    public function getUrlAttribute(): string
+    protected function url(): Attribute
     {
-        return asset('storage/'.$this->path);
+        return Attribute::make(get: function () {
+            return asset('storage/'.$this->path);
+        });
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\DTO\ArticleFilterData;
@@ -10,48 +12,48 @@ use Illuminate\Support\Arr;
 
 readonly class ArticleSearchService
 {
-    public function __construct(private ElasticsearchService $es) {}
+    public function __construct(private ElasticsearchService $elasticsearchService) {}
 
     /**
      * @throws AuthenticationException
      * @throws ClientResponseException
      * @throws ServerResponseException
      */
-    public function search(ArticleFilterData $filters): array
+    public function search(ArticleFilterData $articleFilterData): array
     {
         $queryBody = [
             'index' => 'articles',
-            'from' => ($filters->page - 1) * $filters->size,
-            'size' => $filters->size,
+            'from' => ($articleFilterData->page - 1) * $articleFilterData->size,
+            'size' => $articleFilterData->size,
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' => $this->buildMustQueries($filters),
-                        'filter' => $this->buildFilterQueries($filters),
+                        'must' => $this->buildMustQueries($articleFilterData),
+                        'filter' => $this->buildFilterQueries($articleFilterData),
                     ],
                 ],
             ],
         ];
 
-        $results = $this->es->client()->search($queryBody);
+        $results = $this->elasticsearchService->client()->search($queryBody);
 
         return [
             'articles' => collect($results['hits']['hits'])->pluck('_source')->all(),
             'total' => $results['hits']['total']['value'] ?? 0,
-            'filters' => $filters->toArray(),
+            'filters' => $articleFilterData->toArray(),
         ];
     }
 
-    private function buildMustQueries(ArticleFilterData $filters): array
+    private function buildMustQueries(ArticleFilterData $articleFilterData): array
     {
         $must = [];
 
-        if ($filters->q) {
-            $must[] = mb_strlen($filters->q) <= 2
-                ? ['wildcard' => ['title' => "*{$filters->q}*"]]
+        if ($articleFilterData->q) {
+            $must[] = mb_strlen($articleFilterData->q) <= 2
+                ? ['wildcard' => ['title' => "*{$articleFilterData->q}*"]]
                 : [
                     'multi_match' => [
-                        'query' => $filters->q,
+                        'query' => $articleFilterData->q,
                         'fields' => ['title^2', 'tags'],
                         'fuzziness' => 'auto',
                         'operator' => 'and',
@@ -60,29 +62,29 @@ readonly class ArticleSearchService
                 ];
         }
 
-        if ($filters->tag) {
-            $must[] = ['term' => ['tags' => $filters->tag]];
+        if ($articleFilterData->tag) {
+            $must[] = ['term' => ['tags' => $articleFilterData->tag]];
         }
 
         return $must;
     }
 
-    private function buildFilterQueries(ArticleFilterData $filters): array
+    private function buildFilterQueries(ArticleFilterData $articleFilterData): array
     {
         $filter = [];
 
-        if ($filters->city) {
-            $filter[] = ['term' => ['city_name' => $filters->city]];
+        if ($articleFilterData->city) {
+            $filter[] = ['term' => ['city_name' => $articleFilterData->city]];
         }
 
-        if ($filters->lat && $filters->lon && $filters->radius > 0) {
-            $filter = array_filter($filter, fn ($f) => ! Arr::has($f, 'term.city_name'));
+        if ($articleFilterData->lat && $articleFilterData->lon && $articleFilterData->radius > 0) {
+            $filter = array_filter($filter, fn ($f): bool => ! Arr::has($f, 'term.city_name'));
             $filter[] = [
                 'geo_distance' => [
-                    'distance' => "{$filters->radius}km",
+                    'distance' => "{$articleFilterData->radius}km",
                     'location' => [
-                        'lat' => $filters->lat,
-                        'lon' => $filters->lon,
+                        'lat' => $articleFilterData->lat,
+                        'lon' => $articleFilterData->lon,
                     ],
                 ],
             ];

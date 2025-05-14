@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreContactImportRequest;
@@ -18,13 +20,13 @@ class ContactController extends Controller
         ]);
     }
 
-    public function import(StoreContactImportRequest $request)
+    public function import(StoreContactImportRequest $storeContactImportRequest)
     {
-        $file = $request->file('file');
+        $file = $storeContactImportRequest->file('file');
 
         Excel::queueImport(new ContactsImport, $file)
             ->chain([
-                function () {
+                function (): void {
                     event(new ContactImportFinished());
                 }
             ]);

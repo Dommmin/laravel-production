@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Browser;
 
 use App\Models\User;
@@ -7,15 +9,15 @@ use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 use Faker\Factory as Faker;
 
-class ChatTest extends DuskTestCase
+final class ChatTest extends DuskTestCase
 {
-    public function test_user_can_send_and_see_message_in_chat()
+    public function test_user_can_send_and_see_message_in_chat(): void
     {
-        $this->browse(function (Browser $browser) {
-            $faker = Faker::create();
+        $this->browse(function (Browser $browser): void {
+            $generator = Faker::create();
             $sender = User::factory()->create(['password' => 'password']);
             $recipient = User::factory()->create();
-            $message = $faker->sentence;
+            $message = $generator->sentence;
 
             $browser->loginAs($sender)
                 ->visit('/chat?recipient_id=' . $recipient->id)
@@ -30,9 +32,9 @@ class ChatTest extends DuskTestCase
         });
     }
 
-    public function test_user_can_switch_conversation_and_see_empty_state()
+    public function test_user_can_switch_conversation_and_see_empty_state(): void
     {
-        $this->browse(function (Browser $browser) {
+        $this->browse(function (Browser $browser): void {
             $sender = User::factory()->create(['password' => 'password']);
             $recipient1 = User::factory()->create();
             $recipient2 = User::factory()->create();

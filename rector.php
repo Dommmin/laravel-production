@@ -2,6 +2,7 @@
 
 use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\SetList;
+use RectorLaravel\Set\LaravelLevelSetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -10,6 +11,13 @@ return RectorConfig::configure()
         __DIR__ . '/routes',
         __DIR__ . '/tests',
     ])
-    ->withPreparedSets(
-        typeDeclarations: true,
-    );
+    ->withImportNames()
+    ->withSets([
+        SetList::DEAD_CODE,
+        SetList::EARLY_RETURN,
+        SetList::TYPE_DECLARATION,
+        SetList::NAMING,
+        SetList::PHP_84,
+        SetList::RECTOR_PRESET,
+        LaravelLevelSetList::UP_TO_LARAVEL_120,
+    ]);

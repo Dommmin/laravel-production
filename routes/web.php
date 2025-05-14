@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FileController;
@@ -14,7 +16,7 @@ Route::get('/up', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
-Route::get('/test-mail', function () {
+Route::get('/test-mail', function (): string {
     try {
         Mail::to('text@example.com')->queue(new TestMail);
     } catch (Exception $e) {
@@ -33,7 +35,7 @@ Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('art
 Route::get('/articles/{article}/similar', [ArticleController::class, 'similar'])->name('articles.similar');
 Route::get('/articles/aggregation/cities', [ArticleController::class, 'cityAggregation'])->name('articles.aggregation.cities');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function (): void {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{chat}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{chat}', [ChatController::class, 'store'])->name('chat.send');

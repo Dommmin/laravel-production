@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\User;
@@ -15,7 +17,7 @@ class ChatMessageFactory extends Factory
         return [
             'user_id' => $userId,
             'recipient_id' => $recipientId,
-            'message' => $this->faker->realTextBetween(10, 100),
+            'message' => fake()->realTextBetween(10, 100),
         ];
     }
 }

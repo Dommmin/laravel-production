@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Jobs\ReindexArticles;
@@ -22,10 +24,10 @@ class ReindexArticlesElasticsearch extends Command
      * @throws ServerResponseException
      * @throws MissingParameterException
      */
-    public function handle(ElasticsearchService $es): void
+    public function handle(ElasticsearchService $elasticsearchService): void
     {
         $this->info('Creating index articles with mapping...');
-        $es->createArticlesIndex();
+        $elasticsearchService->createArticlesIndex();
         $this->info('Reindexing articles...');
         ReindexArticles::dispatchSync();
         $this->info('Done!');

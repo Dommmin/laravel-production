@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\DTO\ArticleFilterData;
@@ -15,10 +17,6 @@ class Article extends Model
     use HasFactory, HasSlug;
 
     protected $guarded = ['id'];
-
-    protected $casts = [
-        'location' => 'array',
-    ];
 
     public function user(): BelongsTo
     {
@@ -42,23 +40,29 @@ class Article extends Model
             ->saveSlugsTo('slug');
     }
 
-    public static function getArticlesForIndex(ArticleFilterData $filters)
+    public static function getArticlesForIndex(ArticleFilterData $articleFilterData)
     {
         return self::query()
             ->with(['tags', 'user'])
-            ->when($filters->city, fn ($query, $city) => $query->where('city_name', $city))
-            ->when($filters->tag, fn ($query, $tag) => $query->whereHas('tags', fn ($query) => $query->where('name', $tag)))
-            ->when($filters->q, fn ($query, $search) => $query->where(function ($query) use ($search) {
+            ->when($articleFilterData->city, fn ($query, $city) => $query->where('city_name', $city))
+            ->when($articleFilterData->tag, fn ($query, $tag) => $query->whereHas('tags', fn ($query) => $query->where('name', $tag)))
+            ->when($articleFilterData->q, fn ($query, $search) => $query->where(function ($query) use ($search) {
                 return $query->where('title', 'like', "%{$search}%");
             }))
             ->paginate(20)
             ->withQueryString()
-            ->through(function (Article $article) {
+            ->through(function (Article $article): \App\Models\Article {
                 $tags = $article->tags;
                 $article->unsetRelation('tags');
                 $article->setAttribute('tags', $tags->pluck('name')->toArray());
 
                 return $article;
             });
+    }
+    protected function casts(): array
+    {
+        return [
+            'location' => 'array',
+        ];
     }
 }

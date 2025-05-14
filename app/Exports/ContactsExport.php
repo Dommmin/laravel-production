@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exports;
 
 use App\Models\Contact;
@@ -22,4 +24,4 @@ class ContactsExport implements FromCollection, WithHeadings
             'company',
         ];
     }
-} 
+}

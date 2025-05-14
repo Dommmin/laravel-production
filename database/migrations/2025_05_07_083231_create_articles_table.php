@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,15 +14,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('articles', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('slug')->unique();
-            $table->text('content');
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->json('location')->nullable();
-            $table->string('city_name')->nullable();
-            $table->timestamps();
+        Schema::create('articles', function (Blueprint $blueprint): void {
+            $blueprint->id();
+            $blueprint->string('title');
+            $blueprint->string('slug')->unique();
+            $blueprint->text('content');
+            $blueprint->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
+            $blueprint->json('location')->nullable();
+            $blueprint->string('city_name')->nullable();
+            $blueprint->timestamps();
         });
     }
 

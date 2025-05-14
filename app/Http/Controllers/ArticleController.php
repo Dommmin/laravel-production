@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\DTO\ArticleFilterData;
@@ -19,21 +21,21 @@ use Inertia\Response;
 
 class ArticleController extends Controller
 {
-    public function __construct(private readonly ElasticsearchService $es, private readonly CityService $cityService, private readonly TagService $tagService) {}
+    public function __construct(private readonly ElasticsearchService $elasticsearchService, private readonly CityService $cityService, private readonly TagService $tagService) {}
 
     /**
      * @throws AuthenticationException
      * @throws ServerResponseException
      * @throws ClientResponseException
      */
-    public function index(IndexArticleRequest $request, ArticleSearchService $searchService): Response
+    public function index(IndexArticleRequest $indexArticleRequest, ArticleSearchService $articleSearchService): Response
     {
-        $filters = ArticleFilterData::from($request->validated());
+        $articleFilterData = ArticleFilterData::from($indexArticleRequest->validated());
         $cities = $this->cityService->getAvailableCities();
         $tags = $this->tagService->getAvailableTags();
 
         if (config('elasticsearch.enabled')) {
-            $result = $searchService->search($filters);
+            $result = $articleSearchService->search($articleFilterData);
 
             return Inertia::render('home/elastic', array_merge($result, [
                 'cities' => $cities,
@@ -42,8 +44,8 @@ class ArticleController extends Controller
         }
 
         return Inertia::render('home/index', [
-            'articles' => Article::getArticlesForIndex($filters),
-            'filters' => $filters,
+            'articles' => Article::getArticlesForIndex($articleFilterData),
+            'filters' => $articleFilterData,
             'cities' => $cities,
             'tags' => $tags,
         ]);
@@ -63,7 +65,7 @@ class ArticleController extends Controller
      */
     public function similar(Request $request, Article $article): JsonResponse
     {
-        $client = $this->es->client();
+        $client = $this->elasticsearchService->client();
         $response = $client->search([
             'index' => 'articles',
             'body' => [
@@ -97,7 +99,7 @@ class ArticleController extends Controller
      */
     public function cityAggregation(): JsonResponse
     {
-        $client = $this->es->client();
+        $client = $this->elasticsearchService->client();
         $response = $client->search([
             'index' => 'articles',
             'body' => [

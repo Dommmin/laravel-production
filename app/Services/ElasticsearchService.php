@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
+use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
 use Elastic\Elasticsearch\Exception\AuthenticationException;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
@@ -13,7 +16,7 @@ class ElasticsearchService
     /**
      * @throws AuthenticationException
      */
-    public function client()
+    public function client(): Client
     {
         return ClientBuilder::create()
             ->setHosts([config('elasticsearch.host')])

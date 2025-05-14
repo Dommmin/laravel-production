@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Services;
 
 use App\DTO\ArticleFilterData;
@@ -8,7 +10,7 @@ use App\Services\ElasticsearchService;
 use Mockery;
 use Tests\TestCase;
 
-class ArticleSearchServiceTest extends TestCase
+final class ArticleSearchServiceTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -16,7 +18,7 @@ class ArticleSearchServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_basic_search_returns_expected_structure()
+    public function test_basic_search_returns_expected_structure(): void
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('search')->andReturn([
@@ -33,9 +35,9 @@ class ArticleSearchServiceTest extends TestCase
         ]);
         $mockEs = Mockery::mock(ElasticsearchService::class);
         $mockEs->shouldReceive('client')->andReturn($mockClient);
-        $service = new ArticleSearchService($mockEs);
-        $filters = new ArticleFilterData(q: 'Test');
-        $result = $service->search($filters);
+        $articleSearchService = new ArticleSearchService($mockEs);
+        $articleFilterData = new ArticleFilterData(q: 'Test');
+        $result = $articleSearchService->search($articleFilterData);
         $this->assertArrayHasKey('articles', $result);
         $this->assertArrayHasKey('total', $result);
         $this->assertArrayHasKey('filters', $result);
@@ -43,7 +45,7 @@ class ArticleSearchServiceTest extends TestCase
         $this->assertEquals(1, $result['total']);
     }
 
-    public function test_search_by_tag_returns_only_tagged_articles()
+    public function test_search_by_tag_returns_only_tagged_articles(): void
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('search')->andReturn([
@@ -60,14 +62,14 @@ class ArticleSearchServiceTest extends TestCase
         ]);
         $mockEs = Mockery::mock(ElasticsearchService::class);
         $mockEs->shouldReceive('client')->andReturn($mockClient);
-        $service = new ArticleSearchService($mockEs);
-        $filters = new ArticleFilterData(tag: 'laravel');
-        $result = $service->search($filters);
+        $articleSearchService = new ArticleSearchService($mockEs);
+        $articleFilterData = new ArticleFilterData(tag: 'laravel');
+        $result = $articleSearchService->search($articleFilterData);
         $this->assertCount(1, $result['articles']);
         $this->assertEquals('laravel', $result['articles'][0]['tags'][0]);
     }
 
-    public function test_search_by_city_returns_only_city_articles()
+    public function test_search_by_city_returns_only_city_articles(): void
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('search')->andReturn([
@@ -84,14 +86,14 @@ class ArticleSearchServiceTest extends TestCase
         ]);
         $mockEs = Mockery::mock(ElasticsearchService::class);
         $mockEs->shouldReceive('client')->andReturn($mockClient);
-        $service = new ArticleSearchService($mockEs);
-        $filters = new ArticleFilterData(city: 'New York');
-        $result = $service->search($filters);
+        $articleSearchService = new ArticleSearchService($mockEs);
+        $articleFilterData = new ArticleFilterData(city: 'New York');
+        $result = $articleSearchService->search($articleFilterData);
         $this->assertCount(1, $result['articles']);
         $this->assertEquals('New York', $result['articles'][0]['city_name']);
     }
 
-    public function test_geo_search_returns_city_within_radius()
+    public function test_geo_search_returns_city_within_radius(): void
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('search')->andReturn([
@@ -109,9 +111,9 @@ class ArticleSearchServiceTest extends TestCase
         ]);
         $mockEs = Mockery::mock(ElasticsearchService::class);
         $mockEs->shouldReceive('client')->andReturn($mockClient);
-        $service = new ArticleSearchService($mockEs);
-        $filters = new ArticleFilterData(lat: 51.1079, lon: 17.0385, radius: 300);
-        $result = $service->search($filters);
+        $articleSearchService = new ArticleSearchService($mockEs);
+        $articleFilterData = new ArticleFilterData(lat: 51.1079, lon: 17.0385, radius: 300);
+        $result = $articleSearchService->search($articleFilterData);
         $this->assertCount(1, $result['articles']);
         $this->assertEquals('New York', $result['articles'][0]['city_name']);
     }

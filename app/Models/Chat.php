@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +25,7 @@ class Chat extends Model
     protected static function boot()
     {
         parent::boot();
-        static::creating(function ($model) {
+        static::creating(function ($model): void {
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
@@ -43,13 +45,13 @@ class Chat extends Model
     public static function getList()
     {
         return Chat::query()
-            ->with(['users' => function ($query) {
+            ->with(['users' => function ($query): void {
                 $query->where('user_id', '!=', auth()->id());
-            }, 'messages' => function ($query) {
+            }, 'messages' => function ($query): void {
                 $query->latest()->take(1);
             }])
             ->get()
-            ->map(function (Chat $chat) {
+            ->map(function (Chat $chat): \App\Models\Chat {
                 $chat->name = $chat->name ?: $chat->users->map(function (User $user) {
                     return $user->name;
                 })->implode(', ');

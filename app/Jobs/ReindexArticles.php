@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Article;
@@ -12,15 +14,15 @@ class ReindexArticles implements ShouldQueue
 {
     use Queueable;
 
-    public function handle(ElasticsearchService $es): void
+    public function handle(ElasticsearchService $elasticsearchService): void
     {
-        Article::with(['user', 'tags'])->chunk(100, function ($articles) use ($es) {
+        Article::with(['user', 'tags'])->chunk(100, function ($articles) use ($elasticsearchService): void {
             foreach ($articles as $article) {
 
                 /** @var User $user */
                 $user = $article->user;
 
-                $es->index([
+                $elasticsearchService->index([
                     'index' => 'articles',
                     'id' => $article->id,
                     'body' => [

@@ -90,7 +90,7 @@ jobs:
             echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
             echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
             echo "TAG=latest"
-          } > .env
+          } >> .env
 
       - name: Transfer deployment files
         run: |

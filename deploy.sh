@@ -1,30 +1,34 @@
 #!/bin/bash
 
-# Exit on error
-set -e
+# Fail immediately if any command fails
+set -eo pipefail
 
-echo "🚀 Starting deployment..."
+# Deployment header
+echo "🚀 Starting production deployment..."
+echo "🕒 $(date)"
 
-# Pull latest Docker images
-echo "📥 Pulling latest Docker images..."
+# Pull latest images
+echo "📥 Pulling updated Docker images..."
 docker compose pull
 
-if [ "$(docker ps -q --filter "name=app")" ]; then
-echo "🔄 Restarting containers..."
-    docker compose down
-fi
+# Stop existing containers if running
+echo "🛑 Stopping existing containers..."
+docker compose down --remove-orphans
 
-docker compose up -d
+# Start fresh containers
+echo "🔄 Starting new containers..."
+docker compose up -d --force-recreate
 
-# Run Laravel commands
-echo "⚡ Running Laravel commands..."
+# Run application maintenance
+echo "🔧 Running application maintenance tasks..."
 docker compose exec -T app php artisan optimize:clear
-docker compose exec -T app php artisan optimize
 docker compose exec -T app php artisan storage:link
 docker compose exec -T app php artisan migrate --force
 
-# Clean up old releases
-echo "🧹 Cleaning up old releases..."
-docker system prune -f
+# Cleanup old Docker objects
+echo "🧹 Cleaning up unused Docker resources..."
+docker system prune --volumes -f
 
+# Success message
 echo "✅ Deployment completed successfully!"
+echo "🕒 $(date)"

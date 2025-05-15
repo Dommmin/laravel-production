@@ -32,6 +32,7 @@ class ContactsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
 
     private array $failures = [];
     private ImportJob $importJob;
+    private const MAX_ERRORS_TO_SHOW = 3;
 
     public function __construct(string $filename)
     {
@@ -57,7 +58,7 @@ class ContactsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:contacts,email', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable'],
             'company' => ['nullable', 'string', 'max:255'],
         ];
@@ -65,21 +66,32 @@ class ContactsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
 
     public function onFailure(Failure ...$failures): void
     {
-        foreach ($failures as $failure) {
-            $this->failures[] = $failure;
+        $this->failures = array_merge($this->failures, $failures);
+        $totalFailures = count($this->failures);
+
+        $formattedFailures = array_map(function (Failure $failure) {
+            return [
+                'row' => $failure->row(),
+                'attribute' => $failure->attribute(),
+                'errors' => $failure->errors(),
+            ];
+        }, $failures);
+
+        $errorsToShow = array_slice($formattedFailures, 0, self::MAX_ERRORS_TO_SHOW);
+
+        if ($totalFailures > self::MAX_ERRORS_TO_SHOW) {
+            $errorsToShow[] = [
+                'row' => null,
+                'attribute' => null,
+                'errors' => ['And ' . ($totalFailures - self::MAX_ERRORS_TO_SHOW) . ' more validation errors'],
+            ];
         }
 
         $this->importJob->update([
-            'errors' => array_merge($this->importJob->errors ?? [], array_map(function ($failure) {
-                return [
-                    'row' => $failure->row(),
-                    'attribute' => $failure->attribute(),
-                    'errors' => $failure->errors(),
-                ];
-            }, $failures)),
+            'errors' => array_merge($this->importJob->errors ?? [], $errorsToShow),
         ]);
 
-        event(new ContactImportFailed($this->failures));
+        event(new ContactImportFailed($errorsToShow));
     }
 
     public function onError(Throwable $e): void
@@ -101,6 +113,26 @@ class ContactsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
         event(new ContactImportError());
     }
 
+    public function registerEvents(): array
+    {
+        return [
+            AfterImport::class => function(AfterImport $event) {
+                $importJob = ImportJob::find($this->importJob->id);
+                if (!$importJob) return;
+
+                $status = empty($importJob->hasErrors())
+                    ? ImportJobEnum::STATUS_COMPLETED->value
+                    : ImportJobEnum::STATUS_FAILED->value;
+
+                $importJob->update(['status' => $status]);
+
+                if ($status === ImportJobEnum::STATUS_COMPLETED->value) {
+                    event(new ContactImportFinished());
+                }
+            },
+        ];
+    }
+
     public function chunkSize(): int
     {
         return 1000;
@@ -109,25 +141,5 @@ class ContactsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
     public function batchSize(): int
     {
         return 1000;
-    }
-
-    public function registerEvents(): array
-    {
-        return [
-            AfterImport::class => function(AfterImport $event) {
-                $importJob = ImportJob::find($this->importJob->id);
-
-                if (!$importJob) return;
-
-                $status = empty($importJob->hasErrors())
-                    ? ImportJobEnum::STATUS_COMPLETED->value
-                    : ImportJobEnum::STATUS_FAILED->value;
-                $importJob->update(['status' => $status]);
-
-                if ($status === ImportJobEnum::STATUS_COMPLETED->value) {
-                    event(new ContactImportFinished());
-                }
-            },
-        ];
     }
 }

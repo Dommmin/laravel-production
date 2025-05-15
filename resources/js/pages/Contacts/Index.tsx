@@ -33,7 +33,6 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
 
         const parts: string[] = [];
         if (error.row) parts.push(`Row ${error.row}`);
-        if (error.attribute) parts.push(`Field: ${error.attribute}`);
         if (error.errors && error.errors.length > 0) {
             parts.push(error.errors.join(', '));
         }
@@ -99,7 +98,7 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
                     onChange={e => setData('file', e.target.files?.[0] || null)}
                     className="max-w-xs"
                 />
-                <Button type="submit" disabled={processing} variant="default">Import</Button>
+                <Button type="submit" disabled={processing || importing} variant="default">{processing || importing ? 'Importing...' : 'Import'}</Button>
                 <Button type="button" onClick={handleExport} variant="secondary">Export</Button>
                 <a href="./SampleImport.csv" download className="ml-2 underline text-sm">Download sample CSV</a>
             </form>

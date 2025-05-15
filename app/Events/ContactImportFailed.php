@@ -9,7 +9,6 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Maatwebsite\Excel\Validators\Failure;
 
 class ContactImportFailed implements ShouldBroadcastNow
 {
@@ -19,13 +18,7 @@ class ContactImportFailed implements ShouldBroadcastNow
 
     public function __construct(array $failures)
     {
-        $this->failures = array_map(function (Failure $failure) {
-            return [
-                'row' => $failure->row(),
-                'attribute' => $failure->attribute(),
-                'errors' => $failure->errors(),
-            ];
-        }, $failures);
+        $this->failures = $failures;
     }
 
     public function broadcastOn()

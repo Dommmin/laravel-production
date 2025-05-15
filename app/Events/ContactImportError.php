@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ContactImportFinished implements ShouldBroadcastNow
+class ContactImportError implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -21,6 +21,13 @@ class ContactImportFinished implements ShouldBroadcastNow
 
     public function broadcastAs(): string
     {
-        return 'ContactImportFinished';
+        return 'ContactImportError';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'message' => 'An error occurred during the import',
+        ];
     }
 }

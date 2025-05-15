@@ -6,35 +6,34 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreContactImportRequest;
 use App\Models\Contact;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ContactsImport;
 use App\Exports\ContactsExport;
-use App\Events\ContactImportFinished;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ContactController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
-        return inertia('Contacts/Index', [
-            'contacts' => Contact::latest()->simplePaginate(20),
+        return Inertia::render('Contacts/Index', [
+            'contacts' => Contact::paginate(10),
         ]);
     }
 
-    public function import(StoreContactImportRequest $storeContactImportRequest)
+    public function import(StoreContactImportRequest $request): RedirectResponse
     {
-        $file = $storeContactImportRequest->file('file');
+        $file = $request->file('file');
+        $filename = $file->getClientOriginalName();
 
-        Excel::queueImport(new ContactsImport, $file)
-            ->chain([
-                function (): void {
-                    event(new ContactImportFinished());
-                }
-            ]);
+        Excel::queueImport(new ContactsImport($filename), $file);
 
-        return to_route('contacts.index')->with('success', 'Contact started importing.');
+        return back();
     }
 
-    public function export()
+    public function export(): BinaryFileResponse
     {
         return Excel::download(new ContactsExport, 'contacts.xlsx');
     }

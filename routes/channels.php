@@ -11,3 +11,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id): bool {
 Broadcast::channel('chat.{recipientId}', function ($user, $recipientId): bool {
     return (int) $user->id === (int) $recipientId;
 });
+
+Broadcast::channel('imports', function ($user) {
+    return true;
+});

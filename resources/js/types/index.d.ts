@@ -42,7 +42,7 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
-interface Article {
+export interface Article {
     id: number;
     title: string;
     slug: string;
@@ -59,7 +59,7 @@ interface Article {
     city_name?: string;
 }
 
-interface FiltersProps {
+export interface FiltersProps {
     q: string;
     setQuery: (query: string) => void;
     tag: string;
@@ -90,4 +90,18 @@ export interface Chat {
     id: string;
     name?: string;
     users: User[];
+}
+
+export interface Contact {
+    id: number;
+    name: string;
+    email: string;
+    phone?: string;
+    company?: string;
+}
+
+export interface ImportError {
+    row?: number;
+    attribute?: string;
+    errors?: string[];
 }

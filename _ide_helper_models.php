@@ -48,23 +48,47 @@ namespace App\Models{
 /**
  * 
  *
- * @property int $id
- * @property int $user_id
- * @property int $recipient_id
- * @property string $message
- * @property string|null $image_path
+ * @property string $id
+ * @property string|null $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $recipient
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatMessage> $messages
+ * @property-read int|null $messages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chat newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chat newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chat query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chat whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chat whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chat whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chat whereUpdatedAt($value)
+ */
+	class Chat extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $chat_id
+ * @property int $user_id
+ * @property string $message
+ * @property string|null $read_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Chat $chat
  * @property-read \App\Models\User $user
+ * @method static \Database\Factories\ChatMessageFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereChatId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereImagePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereMessage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereRecipientId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereReadAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatMessage whereUserId($value)
  */
@@ -77,10 +101,35 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $name
+ * @property string $email
+ * @property string|null $phone
+ * @property string|null $company
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact whereCompany($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact whereUpdatedAt($value)
+ */
+	class Contact extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $name
  * @property string $path
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read string $url
+ * @property-read mixed $url
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File query()
@@ -91,6 +140,33 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereUpdatedAt($value)
  */
 	class File extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $status
+ * @property array<array-key, mixed>|null $errors
+ * @property int $total_rows
+ * @property int $processed_rows
+ * @property string $filename
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereErrors($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereFilename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereProcessedRows($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereTotalRows($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ImportJob whereUpdatedAt($value)
+ */
+	class ImportJob extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -127,12 +203,12 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Chat> $chats
+ * @property-read int|null $chats_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatMessage> $messages
+ * @property-read int|null $messages_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatMessage> $receivedMessages
- * @property-read int|null $received_messages_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatMessage> $sentMessages
- * @property-read int|null $sent_messages_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()

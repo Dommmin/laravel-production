@@ -10,7 +10,8 @@ RUN npm ci
 COPY vite.config.ts tsconfig.json ./
 COPY resources resources
 
-RUN npm run build
+# Clean build directory and rebuild
+RUN rm -rf public/build || true && npm run build
 
 FROM php:8.4-fpm-alpine AS php-stage
 

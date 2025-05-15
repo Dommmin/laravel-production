@@ -22,4 +22,4 @@ return [
     'exports' => [
         'chunk_size' => 1000,
     ],
-]; 
+];

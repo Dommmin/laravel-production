@@ -3,7 +3,7 @@ import { UserList } from '@/components/chat/users-list';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import type { Message, User, Chat } from '@/types';
+import type { Chat, Message, User } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import React, { useEffect, useRef } from 'react';
 

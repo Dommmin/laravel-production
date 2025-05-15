@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\PdfDemoController;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PdfDemoController;
-use App\Http\Controllers\ContactController;
 
 // Health check endpoint
 Route::get('/up', function () {

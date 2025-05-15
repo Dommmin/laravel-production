@@ -35,7 +35,7 @@ readonly class ArticleSearchService
             ],
         ];
 
-        $results = $this->elasticsearchService->client()->search($queryBody);
+        $results = $this->elasticsearchService->search($queryBody);
 
         return [
             'articles' => collect($results['hits']['hits'])->pluck('_source')->all(),

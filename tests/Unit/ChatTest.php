@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\ChatMessage;
 use App\Models\User;
+use App\Models\Chat;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -11,33 +12,33 @@ uses(TestCase::class);
 describe('ChatMessage model', function (): void {
     it('has fillable fields', function (): void {
         $model = new ChatMessage;
-        expect($model->getFillable())->toBe(['user_id', 'recipient_id', 'message']);
+        expect($model->getFillable())->toBe(['chat_id', 'user_id', 'recipient_id', 'message', 'read_at']);
     });
 
     it('can create a chat message', function (): void {
         $user = User::factory()->create();
-        $recipient = User::factory()->create();
+        $chat = Chat::factory()->create();
         $msg = ChatMessage::create([
+            'chat_id' => $chat->id,
             'user_id' => $user->id,
-            'recipient_id' => $recipient->id,
             'message' => 'Hello!',
         ]);
 
-        expect($msg->user_id)->toBe($user->id)
-            ->and($msg->recipient_id)->toBe($recipient->id)
+        expect($msg->chat_id)->toBe($chat->id)
+            ->and($msg->user_id)->toBe($user->id)
             ->and($msg->message)->toBe('Hello!');
     });
 
-    it('has user and recipient relations', function (): void {
+    it('has chat and user relations', function (): void {
         $user = User::factory()->create();
-        $recipient = User::factory()->create();
+        $chat = Chat::factory()->create();
         $msg = ChatMessage::create([
+            'chat_id' => $chat->id,
             'user_id' => $user->id,
-            'recipient_id' => $recipient->id,
             'message' => 'Test',
         ]);
 
-        expect($msg->user->id)->toBe($user->id)
-            ->and($msg->recipient->id)->toBe($recipient->id);
+        expect($msg->chat->id)->toBe($chat->id)
+            ->and($msg->user->id)->toBe($user->id);
     });
 });

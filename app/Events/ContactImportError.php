@@ -14,6 +14,10 @@ class ContactImportError implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public function __construct(
+        private readonly int $importJobId,
+    ) {}
+
     public function broadcastOn()
     {
         return new Channel('imports');
@@ -28,6 +32,7 @@ class ContactImportError implements ShouldBroadcastNow
     {
         return [
             'message' => 'An error occurred during the import',
+            'importJobId' => $this->importJobId,
         ];
     }
 }

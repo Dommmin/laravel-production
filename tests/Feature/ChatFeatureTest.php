@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 use App\Events\MessageSent;
+use App\Models\Chat;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
 
 describe('Chat feature', function (): void {
     it('requires authentication to access chat', function (): void {
         $this->get('/chat')->assertRedirect('/login');
-        $this->post('/chat/send', [])->assertRedirect('/login');
+        $this->post('/chat/1', [])->assertRedirect('/login');
     });
 
     it('shows chat for authenticated user', function (): void {
@@ -19,12 +20,11 @@ describe('Chat feature', function (): void {
 
     it('validates message sending', function (): void {
         $user = User::factory()->create();
-        $recipient = User::factory()->create();
+        $chat = Chat::factory()->create();
         $this->actingAs($user)
-            ->postJson('/chat/send', [])->assertStatus(422);
+            ->postJson("/chat/{$chat->id}", [])->assertStatus(422);
         $this->actingAs($user)
-            ->postJson('/chat/send', [
-                'recipient_id' => $recipient->id,
+            ->postJson("/chat/{$chat->id}", [
                 'message' => '',
             ])->assertStatus(422);
     });
@@ -34,16 +34,20 @@ describe('Chat feature', function (): void {
         Event::fake([MessageSent::class]);
         $user = User::factory()->create();
         $recipient = User::factory()->create();
+        $chat = Chat::factory()->create();
+        $chat->users()->attach([$user->id, $recipient->id]);
+
         $this->actingAs($user)
-            ->postJson('/chat/send', [
-                'recipient_id' => $recipient->id,
+            ->postJson("/chat/{$chat->id}", [
                 'message' => 'Hello!',
-            ])->assertRedirectToRoute('chat.index');
+            ])->assertRedirectToRoute('chat.show', $chat->id);
+
         $this->assertDatabaseHas('chat_messages', [
+            'chat_id' => $chat->id,
             'user_id' => $user->id,
-            'recipient_id' => $recipient->id,
             'message' => 'Hello!',
         ]);
+
         Event::assertDispatched(MessageSent::class);
     });
 });

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as DomPdf;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Facades\Pdf;
 
 class PdfDemoController extends Controller
 {
-    public function spatie(Request $request): Pdf
+    public function spatie(Request $request)
     {
         $data = [
             'user' => [

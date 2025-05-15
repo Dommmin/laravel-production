@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,6 +16,7 @@ class Chat extends Model
     use HasFactory;
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -42,7 +44,7 @@ class Chat extends Model
         return $this->hasMany(ChatMessage::class);
     }
 
-    public static function getList()
+    public static function getList(): Collection
     {
         return Chat::query()
             ->with(['users' => function ($query): void {
@@ -51,10 +53,10 @@ class Chat extends Model
                 $query->latest()->take(1);
             }])
             ->get()
-            ->map(function (Chat $chat): \App\Models\Chat {
-                $chat->name = $chat->name ?: $chat->users->map(function (User $user) {
-                    return $user->name;
-                })->implode(', ');
+            ->map(function (Chat $chat): Chat {
+                /** @var Collection<int, User> $users */
+                $users = $chat->users;
+                $chat->name = $chat->name ?: $users->map(fn (Model $user): string => $user->name)->implode(', ');
 
                 return $chat;
             });

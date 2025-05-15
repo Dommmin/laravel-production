@@ -1,5 +1,5 @@
+import { Toaster } from '@/components/ui/sonner';
 import AppLayoutTemplate from '@/layouts/app/app-header-layout';
-import { Toaster } from "@/components/ui/sonner"
 import { type BreadcrumbItem } from '@/types';
 import { type ReactNode } from 'react';
 

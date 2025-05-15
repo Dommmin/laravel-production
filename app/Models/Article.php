@@ -59,6 +59,7 @@ class Article extends Model
                 return $article;
             });
     }
+
     protected function casts(): array
     {
         return [

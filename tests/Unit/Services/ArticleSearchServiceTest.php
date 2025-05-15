@@ -20,8 +20,8 @@ final class ArticleSearchServiceTest extends TestCase
 
     public function test_basic_search_returns_expected_structure(): void
     {
-        $mockClient = Mockery::mock();
-        $mockClient->shouldReceive('search')->andReturn([
+        $mockEs = Mockery::mock(ElasticsearchService::class);
+        $mockEs->shouldReceive('search')->andReturn([
             'hits' => [
                 'hits' => [
                     ['_source' => [
@@ -33,8 +33,6 @@ final class ArticleSearchServiceTest extends TestCase
                 'total' => ['value' => 1],
             ],
         ]);
-        $mockEs = Mockery::mock(ElasticsearchService::class);
-        $mockEs->shouldReceive('client')->andReturn($mockClient);
         $articleSearchService = new ArticleSearchService($mockEs);
         $articleFilterData = new ArticleFilterData(q: 'Test');
         $result = $articleSearchService->search($articleFilterData);
@@ -47,8 +45,8 @@ final class ArticleSearchServiceTest extends TestCase
 
     public function test_search_by_tag_returns_only_tagged_articles(): void
     {
-        $mockClient = Mockery::mock();
-        $mockClient->shouldReceive('search')->andReturn([
+        $mockEs = Mockery::mock(ElasticsearchService::class);
+        $mockEs->shouldReceive('search')->andReturn([
             'hits' => [
                 'hits' => [
                     ['_source' => [
@@ -60,8 +58,6 @@ final class ArticleSearchServiceTest extends TestCase
                 'total' => ['value' => 1],
             ],
         ]);
-        $mockEs = Mockery::mock(ElasticsearchService::class);
-        $mockEs->shouldReceive('client')->andReturn($mockClient);
         $articleSearchService = new ArticleSearchService($mockEs);
         $articleFilterData = new ArticleFilterData(tag: 'laravel');
         $result = $articleSearchService->search($articleFilterData);
@@ -71,8 +67,8 @@ final class ArticleSearchServiceTest extends TestCase
 
     public function test_search_by_city_returns_only_city_articles(): void
     {
-        $mockClient = Mockery::mock();
-        $mockClient->shouldReceive('search')->andReturn([
+        $mockEs = Mockery::mock(ElasticsearchService::class);
+        $mockEs->shouldReceive('search')->andReturn([
             'hits' => [
                 'hits' => [
                     ['_source' => [
@@ -84,8 +80,6 @@ final class ArticleSearchServiceTest extends TestCase
                 'total' => ['value' => 1],
             ],
         ]);
-        $mockEs = Mockery::mock(ElasticsearchService::class);
-        $mockEs->shouldReceive('client')->andReturn($mockClient);
         $articleSearchService = new ArticleSearchService($mockEs);
         $articleFilterData = new ArticleFilterData(city: 'New York');
         $result = $articleSearchService->search($articleFilterData);
@@ -95,8 +89,8 @@ final class ArticleSearchServiceTest extends TestCase
 
     public function test_geo_search_returns_city_within_radius(): void
     {
-        $mockClient = Mockery::mock();
-        $mockClient->shouldReceive('search')->andReturn([
+        $mockEs = Mockery::mock(ElasticsearchService::class);
+        $mockEs->shouldReceive('search')->andReturn([
             'hits' => [
                 'hits' => [
                     ['_source' => [
@@ -109,8 +103,6 @@ final class ArticleSearchServiceTest extends TestCase
                 'total' => ['value' => 1],
             ],
         ]);
-        $mockEs = Mockery::mock(ElasticsearchService::class);
-        $mockEs->shouldReceive('client')->andReturn($mockClient);
         $articleSearchService = new ArticleSearchService($mockEs);
         $articleFilterData = new ArticleFilterData(lat: 51.1079, lon: 17.0385, radius: 300);
         $result = $articleSearchService->search($articleFilterData);

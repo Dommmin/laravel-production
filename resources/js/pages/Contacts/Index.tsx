@@ -1,36 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { type Contact, type ImportError } from '@/types';
 import { Pagination } from '@/components/ui/pagination';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type Contact, type ImportError } from '@/types';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface ContactData {
-    data: Contact[],
-    prev_page_url: string | null,
-    next_page_url: string | null
-    current_page: number
-    last_page: number
+    data: Contact[];
+    prev_page_url: string | null;
+    next_page_url: string | null;
+    current_page: number;
+    last_page: number;
 }
 
 type FormData = {
-    file: File | null
-}
+    file: File | null;
+};
 
 export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
     const { setData, post, processing, errors } = useForm<FormData>({
         file: null,
-    })
+    });
     const [importing, setImporting] = useState(false);
     const [importErrors, setImportErrors] = useState<string[]>([]);
 
     const formatImportError = (error: ImportError): string => {
-
         const parts: string[] = [];
         if (error.row) parts.push(`Row ${error.row}`);
         if (error.errors && error.errors.length > 0) {
@@ -44,7 +43,7 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
             .listen('.ContactImportFinished', () => {
                 setImporting(false);
                 setImportErrors([]);
-                toast.success('Import finished successfully')
+                toast.success('Import finished successfully');
                 router.reload({ only: ['contacts'] });
             })
             .listen('.ContactImportFailed', (event) => {
@@ -79,7 +78,7 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
             },
             onError: () => {
                 toast.error('Something went wrong');
-            }
+            },
         });
     };
 
@@ -90,20 +89,21 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
     return (
         <AppLayout>
             <Head title="Contacts" />
-            <h1 className="text-2xl font-bold mb-4">Contacts</h1>
+            <h1 className="mb-4 text-2xl font-bold">Contacts</h1>
             <form onSubmit={handleImport} className="mb-6 flex items-center gap-2">
-                <Input
-                    type="file"
-                    accept=".csv,.xlsx"
-                    onChange={e => setData('file', e.target.files?.[0] || null)}
-                    className="max-w-xs"
-                />
-                <Button type="submit" disabled={processing || importing} variant="default">{processing || importing ? 'Importing...' : 'Import'}</Button>
-                <Button type="button" onClick={handleExport} variant="secondary">Export</Button>
-                <a href="./SampleImport.csv" download className="ml-2 underline text-sm">Download sample CSV</a>
+                <Input type="file" accept=".csv,.xlsx" onChange={(e) => setData('file', e.target.files?.[0] || null)} className="max-w-xs" />
+                <Button type="submit" disabled={processing || importing} variant="default">
+                    {processing || importing ? 'Importing...' : 'Import'}
+                </Button>
+                <Button type="button" onClick={handleExport} variant="secondary">
+                    Export
+                </Button>
+                <a href="./SampleImport.csv" download className="ml-2 text-sm underline">
+                    Download sample CSV
+                </a>
             </form>
             {importing && (
-                <div className="flex items-center gap-2 mb-4">
+                <div className="mb-4 flex items-center gap-2">
                     <Loader2 className="animate-spin" />
                     <span>Import in progress... Please wait.</span>
                 </div>
@@ -134,7 +134,7 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {contacts.data.map(contact => (
+                    {contacts.data.map((contact) => (
                         <TableRow key={contact.id}>
                             <TableCell>{contact.name}</TableCell>
                             <TableCell>{contact.email}</TableCell>
@@ -150,7 +150,9 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
                     <Pagination className="justify-between">
                         {contacts.prev_page_url ? (
                             <Button variant="outline" asChild>
-                                <Link href={contacts.prev_page_url} prefetch>Previous</Link>
+                                <Link href={contacts.prev_page_url} prefetch>
+                                    Previous
+                                </Link>
                             </Button>
                         ) : (
                             <Button variant="outline" disabled>
@@ -159,12 +161,14 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
                         )}
 
                         <span className="text-muted-foreground text-sm">
-                                Page {contacts.current_page} of {contacts.last_page}
-                            </span>
+                            Page {contacts.current_page} of {contacts.last_page}
+                        </span>
 
                         {contacts.next_page_url ? (
                             <Button variant="outline" asChild>
-                                <Link href={contacts.next_page_url} prefetch>Next</Link>
+                                <Link href={contacts.next_page_url} prefetch>
+                                    Next
+                                </Link>
                             </Button>
                         ) : (
                             <Button variant="outline" disabled>
@@ -174,7 +178,6 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
                     </Pagination>
                 </div>
             )}
-
         </AppLayout>
     );
 }

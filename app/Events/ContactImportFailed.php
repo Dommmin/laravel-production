@@ -16,9 +16,12 @@ class ContactImportFailed implements ShouldBroadcastNow
 
     public array $failures = [];
 
-    public function __construct(array $failures)
+    private int $importJobId;
+
+    public function __construct(array $failures, int $importJobId)
     {
         $this->failures = $failures;
+        $this->importJobId = $importJobId;
     }
 
     public function broadcastOn()
@@ -29,5 +32,13 @@ class ContactImportFailed implements ShouldBroadcastNow
     public function broadcastAs(): string
     {
         return 'ContactImportFailed';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'failures' => $this->failures,
+            'importJobId' => $this->importJobId,
+        ];
     }
 }

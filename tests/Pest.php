@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DuskTestCase;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 pest()->extend(DuskTestCase::class)
 //  ->use(Illuminate\Foundation\Testing\DatabaseMigrations::class)

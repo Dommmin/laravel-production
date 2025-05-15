@@ -25,7 +25,7 @@ class ArticleSeeder extends Seeder
             ['lat' => 51.1079, 'lon' => 17.0385, 'city_name' => 'Berlin'],
         ];
 
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; $i < 1000; $i++) {
             $user = $users->random();
             $loc = $locations[array_rand($locations)];
             $article = Article::create([

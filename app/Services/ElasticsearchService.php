@@ -29,6 +29,17 @@ class ElasticsearchService
      * @throws ServerResponseException
      * @throws MissingParameterException
      */
+    public function search(array $params): array
+    {
+        return $this->client()->search($params);
+    }
+
+    /**
+     * @throws AuthenticationException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     * @throws MissingParameterException
+     */
     public function createArticlesIndex(): void
     {
         $params = [

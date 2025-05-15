@@ -212,7 +212,7 @@ return [
                 'connection' => 'redis',
                 'queue' => ['default'],
                 'balance' => 'simple',
-                'processes' => 3,
+                'maxProcesses' => 10,
                 'tries' => 3,
             ],
         ],

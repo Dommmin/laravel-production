@@ -22,6 +22,7 @@ docker compose up -d --force-recreate
 # Run application maintenance
 echo "🔧 Running application maintenance tasks..."
 docker compose exec -T app php artisan optimize:clear
+docker compose exec -T app php artisan optimize
 docker compose exec -T app php artisan storage:link
 docker compose exec -T app php artisan migrate --force
 

@@ -66,9 +66,12 @@ jobs:
     name: 🚀 Deploy to Production
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 15  # Prevent hanging deployments
+    timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Critical for accessing files!
+
       - name: Setup SSH Authentication
         uses: webfactory/ssh-agent@v0.9.1
         with:
@@ -79,25 +82,19 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Prepare environment file
+      - name: Validate deployment files
         run: |
-          {
-            echo "REGISTRY=${{ env.REGISTRY }}"
-            echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
-            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
-            echo "TAG=latest"
-          } > .env
-
-      - name: Ensure remote directories exist
-        run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "mkdir -p ~/laravel/docker/nginx/conf.d"
+          ls -l docker-compose.production.yml docker/nginx/conf.d/default.conf
 
       - name: Transfer deployment files
         run: |
           scp -P ${{ secrets.SSH_PORT }} \
             docker-compose.production.yml \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
+
+          scp -P ${{ secrets.SSH_PORT }} \
+            docker/nginx/conf.d/default.conf \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/nginx/conf.d/default.conf
 
           scp -P ${{ secrets.SSH_PORT }} \
             .env deploy.sh \

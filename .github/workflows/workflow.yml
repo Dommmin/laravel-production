@@ -82,19 +82,21 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Validate deployment files
+      - name: Prepare environment file
         run: |
-          ls -l docker-compose.production.yml docker/nginx/conf.d/default.conf
+          echo "${{ vars.ENV_FILE }}" > .env
+          {
+            echo "REGISTRY=${{ env.REGISTRY }}"
+            echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
+            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
+            echo "TAG=latest"
+          } > .env
 
       - name: Transfer deployment files
         run: |
           scp -P ${{ secrets.SSH_PORT }} \
             docker-compose.production.yml \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
-
-          scp -P ${{ secrets.SSH_PORT }} \
-            docker/nginx/conf.d/default.conf \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker/nginx/conf.d/default.conf
 
           scp -P ${{ secrets.SSH_PORT }} \
             .env deploy.sh \

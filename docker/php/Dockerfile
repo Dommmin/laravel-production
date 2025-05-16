@@ -7,6 +7,7 @@ RUN npm ci
 
 COPY vite.config.ts tsconfig.json ./
 COPY resources resources
+COPY public public
 
 RUN npm run build
 
@@ -36,8 +37,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 COPY --chown=appuser:appuser . .
 
-COPY --chown=appuser:appuser --from=node-builder /var/www/public/build /var/www/public/build
-
+COPY --chown=appuser:appuser --from=node-builder /var/www/public /var/www/public
 COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
 COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/php.ini
 COPY --chown=appuser:appuser docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf

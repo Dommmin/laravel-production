@@ -7,7 +7,6 @@ RUN npm ci
 
 COPY vite.config.ts tsconfig.json ./
 COPY docker/node/.env .env
-RUN cat .env
 
 COPY . .
 

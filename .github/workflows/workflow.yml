@@ -43,7 +43,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "${{ vars.ENV_FILE }}" > .env
+          echo "${{ vars.ENV_FILE }}" >> .env
 
       - name: Build and push Node builder image
         uses: docker/build-push-action@v5

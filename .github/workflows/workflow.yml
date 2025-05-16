@@ -40,10 +40,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare environment file
-        run: |
-          echo "${{ vars.ENV_FILE }}" > .env
-
       - name: Build and push PHP image
         uses: docker/build-push-action@v5
         with:
@@ -51,11 +47,6 @@ jobs:
           file: docker/php/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.PHP_IMAGE_NAME }}:latest
-          build-args: |
-            VITE_REVERB_APP_KEY=$(grep REVERB_APP_KEY .env | cut -d '=' -f2)
-            VITE_REVERB_HOST=$(grep REVERB_HOST .env | cut -d '=' -f2)
-            VITE_REVERB_PORT=$(grep REVERB_PORT .env | cut -d '=' -f2)
-            VITE_REVERB_SCHEME=$(grep REVERB_SCHEME .env | cut -d '=' -f2)
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64

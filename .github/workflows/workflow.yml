@@ -41,6 +41,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare .env file
+        run: |
+          echo "${{ vars.ENV_FILE }}" > .env
+
       - name: Build and push Node builder image
         uses: docker/build-push-action@v5
         with:
@@ -51,8 +55,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
-          build-args: |
-            ENV_FILE=$(echo "${{ vars.ENV_FILE }}" | jq -Rs . | sed 's/^"\(.*\)"$/\1/')
+          secrets: |
+            env_file=.env
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5

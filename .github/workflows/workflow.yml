@@ -41,16 +41,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare .env file content
-        id: prepare_env
+      - name: Prepare .env file
         run: |
-          if [ -f .env ]; then
-            echo "ENV_FILE_CONTENT<<EOF" >> "$GITHUB_OUTPUT"
-            cat .env >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
-          else
-            echo "ENV_FILE_CONTENT=" >> "$GITHUB_OUTPUT"
-          fi
+          echo "${{ vars.ENV_FILE }}" > .env
 
       - name: Build and push Node builder image
         uses: docker/build-push-action@v5
@@ -63,7 +56,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
           build-args: |
-            ENV_FILE=${{ steps.prepare_env.outputs.ENV_FILE_CONTENT }}
+            ENV_FILE=${{ env.ENV_FILE }}
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5

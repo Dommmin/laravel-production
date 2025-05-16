@@ -9,7 +9,7 @@ services:
       - laravel_storage:/var/www/storage
       - ./.env:/var/www/.env
     ports:
-      - "40168:8080"
+      - "40168:40168"
     networks:
       - laravel_network
     depends_on:
@@ -21,6 +21,7 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - laravel_storage:/var/www/storage
     networks:

@@ -44,7 +44,7 @@ export function SearchFilters({ q, setQuery, tag, setTag, city, setCity, radius,
                     <SelectItem value="300">300 km</SelectItem>
                 </SelectContent>
             </Select>
-            <Button variant="destructive" onClick={() => router.get('/')}>
+            <Button variant="secondary" onClick={() => router.get('/')}>
                 Clear filters
             </Button>
         </div>

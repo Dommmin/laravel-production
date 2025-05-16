@@ -2,26 +2,11 @@ FROM node:22-alpine AS node-builder
 
 WORKDIR /var/www
 
-# Dodajemy argumenty budowania dla zmiennych Vite
-ARG VITE_REVERB_APP_KEY
-ARG VITE_REVERB_HOST
-ARG VITE_REVERB_PORT
-ARG VITE_REVERB_SCHEME
-
-# Ustawiamy zmienne środowiskowe dla etapu budowania
-ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY
-ENV VITE_REVERB_HOST=$VITE_REVERB_HOST
-ENV VITE_REVERB_PORT=$VITE_REVERB_PORT
-ENV VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
-
 COPY package*.json ./
 RUN npm ci
 
 COPY vite.config.ts tsconfig.json ./
 COPY . .
-
-# Wydrukuj zmienne dla debugowania podczas budowy
-RUN echo "Building with: VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY, VITE_REVERB_HOST=$VITE_REVERB_HOST, VITE_REVERB_PORT=$VITE_REVERB_PORT, VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME"
 
 RUN npm run build
 

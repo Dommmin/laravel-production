@@ -7,7 +7,6 @@ services:
     env_file: .env
     volumes:
       - laravel_storage:/var/www/storage
-      - laravel_public:/var/www/public
     ports:
       - "8080:8080"
     networks:
@@ -23,7 +22,6 @@ services:
       - "80:80"
     volumes:
       - laravel_storage:/var/www/storage
-      - laravel_public:/var/www/public
     networks:
       - laravel_network
     depends_on:
@@ -110,7 +108,6 @@ networks:
 
 volumes:
   laravel_storage:
-  laravel_public:
   redis_data:
   prometheus_data:
   grafana_data:

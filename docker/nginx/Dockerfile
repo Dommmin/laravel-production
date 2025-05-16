@@ -8,18 +8,20 @@ RUN npm ci
 
 # Copy remaining files needed for build
 COPY vite.config.ts tsconfig.json ./
-COPY resources resources
-COPY public public
-
-# Copy the rest of the application (including new/removed files)
 COPY . .
 
 RUN npm run build
 
 FROM nginx:stable-alpine
 
-# Copy built assets from node-builder
-COPY --from=node-builder /var/www/public /var/www/public
+# Create necessary directories first
+RUN mkdir -p /var/www/public
+
+# Copy only the built assets from node-builder (not the entire public directory)
+COPY --from=node-builder /var/www/public/build /var/www/public/build
+
+# Copy base public files (index.php, robots.txt, etc.)
+COPY public/*.php public/*.txt public/*.ico /var/www/public/
 
 # Copy nginx configuration
 COPY docker/nginx/conf.d /etc/nginx/conf.d

@@ -8,6 +8,11 @@ RUN npm ci
 COPY vite.config.ts tsconfig.json ./
 COPY . .
 
+ARG VITE_REVERB_APP_KEY
+ARG VITE_REVERB_HOST
+ARG VITE_REVERB_PORT
+ARG VITE_REVERB_SCHEME
+
 RUN npm run build
 
 FROM php:8.4-fpm-alpine

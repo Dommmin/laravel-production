@@ -5,7 +5,15 @@ WORKDIR /var/www
 COPY composer.json composer.lock ./
 COPY docker/php/.env .env
 
+RUN mkdir -p vendor && \
+    chown -R appuser:appuser /var/www && \
+    chmod -R 775 /var/www
+
+USER appuser
+
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+
+USER root
 
 COPY --chown=appuser:appuser . .
 

@@ -23,6 +23,9 @@ RUN apk add --no-cache \
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/
 
+# Install puppeteer globally
+RUN npm install -g puppeteer
+
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
  && pecl install redis && docker-php-ext-enable redis

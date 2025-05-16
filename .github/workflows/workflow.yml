@@ -44,6 +44,7 @@ jobs:
       - name: Prepare .env file
         run: |
           echo "${{ vars.ENV_FILE }}" > .env
+          chmod 600 .env
 
       - name: Build and push Node builder image
         uses: docker/build-push-action@v5
@@ -55,8 +56,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
-          build-args: |
-            ENV_FILE=${{ env.ENV_FILE }}
+          secrets: |
+            "env_file=.env"
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5

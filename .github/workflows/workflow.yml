@@ -55,8 +55,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
-          secrets: |
-            env_file=.env
+          build-args: |
+            ENV_FILE=.env
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5

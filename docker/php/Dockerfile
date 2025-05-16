@@ -21,7 +21,9 @@ RUN apk add --no-cache \
     nodejs npm
 
 ENV CHROME_BIN=/usr/bin/chromium-browser \
-    CHROME_PATH=/usr/lib/chromium/
+    CHROME_PATH=/usr/lib/chromium/ \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Install puppeteer globally
 RUN npm install -g puppeteer
@@ -61,6 +63,7 @@ RUN mkdir -p \
     /var/log/supervisor \
     /var/run/php \
     /var/log/php-fpm \
+    /home/appuser/.cache/puppeteer \
  && chown -R appuser:appuser \
     storage \
     bootstrap/cache \
@@ -68,6 +71,7 @@ RUN mkdir -p \
     /var/log/supervisor \
     /var/run/php \
     /var/log/php-fpm \
+    /home/appuser/.cache/puppeteer \
  && chmod -R 775 storage bootstrap/cache
 
 RUN ln -s /var/www/storage/app/public /var/www/public/storage

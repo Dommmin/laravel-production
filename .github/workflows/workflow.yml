@@ -23,6 +23,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create environment file
+        run: |
+          echo "${{ vars.ENV_FILE }}" > .env
+          # Dodaj sprawdzenie obecności zmiennych VITE_*
+          grep -q "VITE_REVERB_APP_KEY" .env || echo "VITE_REVERB_APP_KEY=$(grep 'REVERB_APP_KEY' .env | cut -d'=' -f2)" >> .env
+          grep -q "VITE_REVERB_HOST" .env || echo "VITE_REVERB_HOST=$(grep 'APP_URL' .env | cut -d'=' -f2 | sed 's/https\?:\/\///')" >> .env
+          grep -q "VITE_REVERB_PORT" .env || echo "VITE_REVERB_PORT=40168" >> .env
+          grep -q "VITE_REVERB_SCHEME" .env || echo "VITE_REVERB_SCHEME=$(grep 'APP_URL' .env | cut -d'=' -f2 | grep -q 'https' && echo 'https' || echo 'http')" >> .env
+          cat .env
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -50,6 +60,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
+          build-args: |
+            VITE_REVERB_APP_KEY=$(grep VITE_REVERB_APP_KEY .env | cut -d= -f2)
+            VITE_REVERB_HOST=$(grep VITE_REVERB_HOST .env | cut -d= -f2)
+            VITE_REVERB_PORT=$(grep VITE_REVERB_PORT .env | cut -d= -f2)
+            VITE_REVERB_SCHEME=$(grep VITE_REVERB_SCHEME .env | cut -d= -f2)
 
       - name: Build and push Nginx image
         uses: docker/build-push-action@v5

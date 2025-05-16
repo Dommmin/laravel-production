@@ -52,7 +52,9 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
           build-args: |
-            ENV_CONTENT=${{ vars.ENV_FILE }}
+            ENV_CONTENT<<EOF
+            ${{ vars.ENV_FILE }}
+            EOF
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5

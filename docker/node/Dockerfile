@@ -8,7 +8,7 @@ RUN npm ci
 COPY vite.config.ts tsconfig.json ./
 
 ARG ENV_CONTENT
-RUN echo "${ENV_CONTENT}" > .env
+RUN echo "$ENV_CONTENT" > .env
 RUN cat .env
 
 COPY . .

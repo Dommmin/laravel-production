@@ -16,7 +16,11 @@ FROM php:8.4-fpm-alpine
 RUN apk add --no-cache \
     git bash curl libpng-dev libxml2-dev zip unzip \
     freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev libzip-dev oniguruma-dev \
-    postgresql-dev supervisor autoconf g++ make
+    postgresql-dev supervisor autoconf g++ make \
+    chromium chromium-chromedriver harfbuzz nss freetype ttf-freefont
+
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/lib/chromium/
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \

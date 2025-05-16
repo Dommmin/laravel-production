@@ -65,8 +65,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
-          build-args: |
-            NODE_IMAGE=${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
+          build-contexts: |
+            node=${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
 
       - name: Build and push Nginx image
         uses: docker/build-push-action@v5
@@ -78,8 +78,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
-          build-args: |
-            NODE_IMAGE=${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
+          build-contexts: |
+            node=${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
 
   deploy:
     name: 🚀 Deploy to Production

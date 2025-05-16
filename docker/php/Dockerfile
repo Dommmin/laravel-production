@@ -1,7 +1,5 @@
 FROM php:8.4-fpm-alpine
 
-ARG NODE_IMAGE
-
 RUN apk add --no-cache \
     git bash curl libpng-dev libxml2-dev zip unzip \
     freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev libzip-dev oniguruma-dev \
@@ -35,7 +33,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 COPY --chown=appuser:appuser . .
 
-COPY --chown=appuser:appuser --from=${NODE_IMAGE} /var/www/public/build /var/www/public/build
+COPY --chown=appuser:appuser --from=node /var/www/public/build /var/www/public/build
 
 COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
 COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/php.ini

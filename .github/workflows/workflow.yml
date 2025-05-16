@@ -10,7 +10,7 @@ env:
   NODE_IMAGE_NAME: dommmin/laravel-production-node-builder
   PHP_IMAGE_NAME: dommmin/laravel-production-php
   NGINX_IMAGE_NAME: dommmin/laravel-production-nginx
-  DOCKER_BUILDKIT: 1  # Enable Docker BuildKit
+  DOCKER_BUILDKIT: 1
 
 jobs:
   build:
@@ -41,9 +41,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create .env file
+      - name: Read .env content into ENV_FILE
+        id: envfile
         run: |
-          echo "${{ vars.ENV_FILE }}" >> .env
+          echo 'ENV_FILE<<EOF' >> $GITHUB_ENV
+          cat .env >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       - name: Build and push Node builder image
         uses: docker/build-push-action@v5
@@ -56,7 +59,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
           build-args: |
-            ENV_FILE=${{ vars.ENV_FILE }}
+            ENV_FILE=${{ env.ENV_FILE }}
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5

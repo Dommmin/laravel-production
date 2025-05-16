@@ -2,16 +2,11 @@ FROM node:22-alpine AS node-builder
 
 WORKDIR /var/www
 
-COPY composer.* ./
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --no-dev --no-scripts --no-autoloader
-
 COPY package*.json ./
 RUN npm ci
 
 COPY vite.config.ts tsconfig.json ./
 COPY resources resources
-COPY vendor vendor
 
 RUN npm run build
 

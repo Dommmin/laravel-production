@@ -2,11 +2,8 @@ FROM dommin/php-8.4-fpm-alpine:latest
 
 USER root
 
-RUN addgroup -g 1000 appuser && \
-    adduser -D -u 1000 -G appuser appuser
-
-RUN sed -i 's/user = www-data/user = appuser/g' /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i 's/group = www-data/group = appuser/g' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/user = www-data/user = www-data/g' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/group = www-data/group = www-data/g' /usr/local/etc/php-fpm.d/www.conf
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -15,11 +12,11 @@ WORKDIR /var/www
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
-COPY --chown=appuser:appuser . .
-COPY --chown=appuser:appuser --from=node /var/www/public/build /var/www/public/build
-COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
-COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/php.ini
-COPY --chown=appuser:appuser docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY --chown=www-data:www-data . .
+COPY --chown=www-data:www-data --from=node /var/www/public/build /var/www/public/build
+COPY --chown=www-data:www-data docker/supervisord.conf /etc/supervisord.conf
+COPY --chown=www-data:www-data docker/php/php.ini /usr/local/etc/php/php.ini
+COPY --chown=www-data:www-data docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 RUN mkdir -p \
     storage/framework/{cache,sessions,views} \
@@ -30,20 +27,20 @@ RUN mkdir -p \
     /var/log/supervisor \
     /var/run/php \
     /var/log/php-fpm \
-    /home/appuser/.cache/puppeteer \
- && chown -R appuser:appuser \
+    /home/www-data/.cache/puppeteer \
+ && chown -R www-data:www-data \
     storage \
     bootstrap/cache \
     public \
     /var/log/supervisor \
     /var/run/php \
     /var/log/php-fpm \
-    /home/appuser/.cache/puppeteer \
+    /home/www-data/.cache/puppeteer \
  && chmod -R 775 storage bootstrap/cache
 
 RUN ln -s /var/www/storage/app/public /var/www/public/storage
 
-USER appuser
+USER www-data
 
 EXPOSE 9000
 

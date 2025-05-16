@@ -41,11 +41,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare environment content
-        id: env_content
-        run: |
-          echo "ENV_CONTENT<<<$(echo '${{ vars.ENV_FILE }}' | sed 's/"/\\"/g')" >> $GITHUB_ENV
-
       - name: Build and push Node builder image
         uses: docker/build-push-action@v5
         with:
@@ -56,7 +51,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
-          build-args: ${{ env.ENV_CONTENT }}
+          build-args: |
+            ENV_CONTENT=${{ vars.ENV_FILE }}
 
       - name: Build and push PHP image
         uses: docker/build-push-action@v5

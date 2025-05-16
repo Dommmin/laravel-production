@@ -59,7 +59,7 @@ class ContactsImport implements ShouldQueue, SkipsOnError, SkipsOnFailure, ToMod
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email', 'unique:contacts,email', 'max:255'],
             'phone' => ['nullable'],
             'company' => ['nullable', 'string', 'max:255'],
         ];

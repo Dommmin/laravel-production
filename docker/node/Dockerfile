@@ -6,7 +6,9 @@ COPY package*.json ./
 RUN npm ci
 
 COPY vite.config.ts tsconfig.json ./
-COPY .env .env
+
+ARG ENV_CONTENT
+RUN echo "${ENV_CONTENT}" > .env
 RUN cat .env
 
 COPY . .

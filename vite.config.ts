@@ -4,6 +4,8 @@ import laravel from 'laravel-vite-plugin';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
+console.log('VITE KEY', process.env.VITE_REVERB_APP_KEY);
+
 export default defineConfig({
     plugins: [
         laravel({

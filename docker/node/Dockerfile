@@ -9,8 +9,7 @@ RUN npm ci
 
 COPY vite.config.ts tsconfig.json ./
 
-RUN echo "${ENV_FILE}" | tee .env
-RUN cat .env
+RUN printf "%s" "$ENV_FILE" > .env
 
 COPY . .
 

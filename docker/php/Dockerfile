@@ -20,23 +20,10 @@ RUN npm ci
 COPY vite.config.ts tsconfig.json ./
 COPY . .
 
-# Debug: Sprawdź zmienne przed budowaniem
-RUN echo "Debug - Environment variables before build:"
-RUN env | grep VITE_
-
-# Debug: Sprawdź zawartość vite.config.ts
-RUN echo "Debug - vite.config.ts content:"
-RUN cat vite.config.ts
+# Wydrukuj zmienne dla debugowania podczas budowy
+RUN echo "Building with: VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY, VITE_REVERB_HOST=$VITE_REVERB_HOST, VITE_REVERB_PORT=$VITE_REVERB_PORT, VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME"
 
 RUN npm run build
-
-# Debug: Sprawdź wygenerowane pliki
-RUN echo "Debug - Generated files in build directory:"
-RUN ls -la /var/www/public/build/
-RUN echo "Debug - Generated files in assets directory:"
-RUN ls -la /var/www/public/build/assets/
-RUN echo "Debug - Content of index.html:"
-RUN cat /var/www/public/build/index.html
 
 FROM php:8.4-fpm-alpine
 

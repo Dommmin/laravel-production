@@ -7,6 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  NODE_IMAGE_NAME: dommmin/laravel-production-node-builder
   PHP_IMAGE_NAME: dommmin/laravel-production-php
   NGINX_IMAGE_NAME: dommmin/laravel-production-nginx
   DOCKER_BUILDKIT: 1  # Enable Docker BuildKit
@@ -40,6 +41,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create .env file
+        run: echo "${{ vars.ENV_FILE }}" > .env
+
+      - name: Build and push Node builder image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/node/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
       - name: Build and push PHP image
         uses: docker/build-push-action@v5
         with:
@@ -51,10 +66,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
           build-args: |
-            VITE_REVERB_APP_KEY=$(grep VITE_REVERB_APP_KEY .env | cut -d= -f2)
-            VITE_REVERB_HOST=$(grep VITE_REVERB_HOST .env | cut -d= -f2)
-            VITE_REVERB_PORT=$(grep VITE_REVERB_PORT .env | cut -d= -f2)
-            VITE_REVERB_SCHEME=$(grep VITE_REVERB_SCHEME .env | cut -d= -f2)
+            NODE_IMAGE=${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
 
       - name: Build and push Nginx image
         uses: docker/build-push-action@v5
@@ -66,6 +78,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
+          build-args: |
+            NODE_IMAGE=${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
 
   deploy:
     name: 🚀 Deploy to Production

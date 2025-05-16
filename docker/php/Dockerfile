@@ -1,16 +1,6 @@
-FROM node:22-alpine AS node-builder
-
-WORKDIR /var/www
-
-COPY package*.json ./
-RUN npm ci
-
-COPY vite.config.ts tsconfig.json ./
-COPY . .
-
-RUN npm run build
-
 FROM php:8.4-fpm-alpine
+
+ARG NODE_IMAGE
 
 RUN apk add --no-cache \
     git bash curl libpng-dev libxml2-dev zip unzip \
@@ -45,7 +35,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 COPY --chown=appuser:appuser . .
 
-COPY --chown=appuser:appuser --from=node-builder /var/www/public/build /var/www/public/build
+COPY --chown=appuser:appuser --from=${NODE_IMAGE} /var/www/public/build /var/www/public/build
 
 COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
 COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/php.ini

@@ -8,7 +8,6 @@ RUN npm ci
 COPY vite.config.ts tsconfig.json ./
 COPY . .
 
-# Build assets
 RUN npm run build
 
 FROM php:8.4-fpm-alpine
@@ -25,7 +24,6 @@ ENV CHROME_BIN=/usr/bin/chromium-browser \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# Install puppeteer globally
 RUN npm install -g puppeteer
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -47,7 +45,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 COPY --chown=appuser:appuser . .
 
-# Then copy the built assets from the node-builder stage
 COPY --chown=appuser:appuser --from=node-builder /var/www/public/build /var/www/public/build
 
 COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf

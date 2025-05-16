@@ -6,7 +6,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY vite.config.ts tsconfig.json ./
-COPY .env .env
+COPY docker/node/.env .env
 RUN cat .env
 
 COPY . .

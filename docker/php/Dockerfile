@@ -1,5 +1,7 @@
 FROM dommin/php-8.4-fpm-alpine:latest
 
+USER root
+
 RUN addgroup -g 1000 appuser && \
     adduser -D -u 1000 -G appuser appuser
 

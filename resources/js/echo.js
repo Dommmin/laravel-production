@@ -15,14 +15,9 @@ window.Echo = new Echo({
     wsHost: import.meta.env.VITE_REVERB_HOST || window.location.hostname,
     wsPort: import.meta.env.VITE_REVERB_PORT || 40168,
     wssPort: import.meta.env.VITE_REVERB_PORT || 40168,
-    forceTLS: false,
+    forceTLS: window.location.protocol === 'https:',
     enabledTransports: ['ws', 'wss'],
     disableStats: true,
     cluster: 'mt1',
-    encrypted: false,
-    auth: {
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-        }
-    }
+    encrypted: window.location.protocol === 'https:',
 });

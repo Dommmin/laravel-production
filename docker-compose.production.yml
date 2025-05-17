@@ -8,8 +8,9 @@ services:
     volumes:
       - laravel_storage:/var/www/storage
       - ./.env:/var/www/.env
-    ports:
-      - "40168:40168"
+    expose:
+      - "9000"
+      - "40168"
     networks:
       - laravel_network
     depends_on:
@@ -22,8 +23,10 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "40168:40168"
     volumes:
       - laravel_storage:/var/www/storage
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
     networks:
       - laravel_network
     depends_on:

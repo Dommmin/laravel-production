@@ -28,6 +28,7 @@ yarn-error.log
 /.bash_history
 
 docker/nginx/log/
+docker/nginx/ssl/
 
 supervisord.log
 

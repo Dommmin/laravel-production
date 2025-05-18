@@ -22,3 +22,4 @@ window.Echo = new Echo({
     wsPath: '/app',
     disabledTransports: ['wss']
 });
+

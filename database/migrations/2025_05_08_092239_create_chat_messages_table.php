@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Models\Chat;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -47,6 +49,21 @@ return new class extends Migration
             $blueprint->foreign('chat_message_id')->references('id')->on('chat_messages')->onDelete('cascade');
             $blueprint->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
+
+        $admin = User::create([
+            'email' => 'admin@example.com',
+            'name' => 'Admin',
+            'password' => bcrypt('Pa$$w0rd!')
+        ]);
+
+        $user = User::create([
+            'email' => 'user@example.com',
+            'name' => 'User',
+            'password' => bcrypt('Pa$$w0rd!')
+        ]);
+
+        $chat = Chat::create();
+        $chat->users()->attach([$admin->id, $user->id]);
     }
 
     /**

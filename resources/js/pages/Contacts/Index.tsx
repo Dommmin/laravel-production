@@ -41,12 +41,14 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
     useEffect(() => {
         window.Echo.channel('imports')
             .listen('.ContactImportFinished', () => {
+                console.log('Contact import finished');
                 setImporting(false);
                 setImportErrors([]);
                 toast.success('Import finished successfully');
                 router.reload({ only: ['contacts'] });
             })
             .listen('.ContactImportFailed', (event) => {
+                console.log('Contact import failed', event);
                 setImporting(false);
                 if (event.failures && Array.isArray(event.failures)) {
                     const formattedErrors = event.failures.map(formatImportError);
@@ -58,6 +60,7 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
                 router.reload({ only: ['contacts'] });
             })
             .listen('.ContactImportError', () => {
+                console.log('Contact import error');
                 setImporting(false);
                 setImportErrors([]);
                 toast.error('Something went wrong');

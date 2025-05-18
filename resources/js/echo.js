@@ -19,7 +19,11 @@ window.Echo = new Echo({
     disableStats: true,
     cluster: 'mt1',
     encrypted: false,
-    wsPath: '/app',
-    disabledTransports: ['wss']
+    disabledTransports: ['wss'],
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        }
+    }
 });
 

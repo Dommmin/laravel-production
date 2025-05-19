@@ -14,11 +14,11 @@ window.Echo = new Echo({
     key: import.meta.env.VITE_REVERB_APP_KEY,
     wsHost: import.meta.env.VITE_REVERB_HOST || window.location.hostname,
     wsPort: import.meta.env.VITE_REVERB_PORT || 443,
-    forceTLS: true,
+    forceTLS: window.location.protocol === 'https:',
     enabledTransports: ['ws', 'wss'],
     disableStats: true,
     cluster: 'mt1',
-    encrypted: true,
+    encrypted: false,
     auth: {
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')

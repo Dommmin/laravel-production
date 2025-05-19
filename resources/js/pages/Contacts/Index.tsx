@@ -39,8 +39,9 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
     };
 
     useEffect(() => {
-        window.Echo.channel('imports')
-            .listen('.ContactImportFinished', () => {
+        const channel = window.Echo.channel('imports');
+
+        channel.listen('.ContactImportFinished', () => {
                 console.log('Contact import finished');
                 setImporting(false);
                 setImportErrors([]);
@@ -66,8 +67,9 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
                 toast.error('Something went wrong');
                 router.reload({ only: ['contacts'] });
             });
+
         return () => {
-            window.Echo.leave('contacts-import');
+            window.Echo.leave('imports');
         };
     }, []);
 

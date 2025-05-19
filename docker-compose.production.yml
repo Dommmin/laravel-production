@@ -10,7 +10,7 @@ services:
       - ./.env:/var/www/.env
     ports:
       - "9000:9000"
-      - "40086:8080"
+      - "8080:8080"
     networks:
       - laravel_network
     depends_on:

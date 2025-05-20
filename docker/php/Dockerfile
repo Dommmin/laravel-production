@@ -43,6 +43,9 @@ RUN mkdir -p \
 
 RUN ln -s /var/www/storage/app/public /var/www/public/storage
 
+# Debug step to print environment variables
+RUN echo "HTPASSWD_USER: $HTPASSWD_USER" && echo "HTPASSWD_PASS: $HTPASSWD_PASS"
+
 # Install apache2-utils and create .htpasswd using secrets
 RUN apk update && apk add --no-cache apache2-utils \
     && htpasswd -bc /etc/nginx/.htpasswd $HTPASSWD_USER $HTPASSWD_PASS

@@ -71,9 +71,6 @@ jobs:
           platforms: linux/amd64
           build-contexts: |
             node=docker-image://${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
-          build-args: |
-            HTPASSWD_USER=${{ secrets.HTPASSWD_USER }}
-            HTPASSWD_PASS=${{ secrets.HTPASSWD_PASS }}
 
       - name: Build and push Nginx image
         uses: docker/build-push-action@v5
@@ -87,6 +84,9 @@ jobs:
           platforms: linux/amd64
           build-contexts: |
             node=docker-image://${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
+          build-args: |
+            HTPASSWD_USER=${{ secrets.HTPASSWD_USER }}
+            HTPASSWD_PASS=${{ secrets.HTPASSWD_PASS }}
 
   deploy:
     name: 🚀 Deploy to Production

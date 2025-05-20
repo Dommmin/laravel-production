@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cart;
-use App\Models\Product;
 use Inertia\Inertia;
 
 class CartController extends Controller
@@ -23,6 +22,7 @@ class CartController extends Controller
         ]);
 
         $cartItem = Cart::updateOrCreate(
+            ['user_id' => auth()->id()],
             ['product_id' => $request->product_id],
             ['quantity' => $request->quantity]
         );

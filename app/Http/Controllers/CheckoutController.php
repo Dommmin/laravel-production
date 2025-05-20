@@ -6,13 +6,34 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Cart;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
     public function index()
     {
         $cartItems = Cart::with('product')->get();
-        return Inertia::render('Checkout/Index', ['cartItems' => $cartItems]);
+
+        $paymentMethods = [
+            'Przelewy24',
+            'PayPal',
+            'Blik',
+            'Płatność online',
+            'Płatność kartą',
+        ];
+
+        $deliveryMethods = [
+            'Inpost',
+            'DHL',
+            'DPD',
+            'Orlen Paczka',
+        ];
+
+        return Inertia::render('Checkout/Index', [
+            'cartItems' => $cartItems,
+            'paymentMethods' => $paymentMethods,
+            'deliveryMethods' => $deliveryMethods
+        ]);
     }
 
     public function store(Request $request)
@@ -24,13 +45,21 @@ class CheckoutController extends Controller
             'paymentMethod' => 'required|string',
         ]);
 
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'total_price' => Cart::sum('quantity * product.price'),
-            'status' => 'pending',
-        ]);
+        DB::transaction(function () use ($request) {
+            $cartItems = Cart::with('product')->where('user_id', auth()->id())->get();
 
-        Cart::truncate();
+            $totalPrice = $cartItems->sum(function ($cartItem) {
+                return $cartItem->quantity * $cartItem->product->price;
+            });
+
+            $order = Order::create([
+                'user_id' => auth()->id(),
+                'total_price' => $totalPrice,
+                'status' => 'pending',
+            ]);
+
+            Cart::where('user_id', auth()->id())->delete();
+        });
 
         return redirect()->route('home')->with('success', 'Order placed successfully!');
     }

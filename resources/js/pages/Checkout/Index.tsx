@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import axios from 'axios';
 
 interface FormData {
   [key: string]: string;
@@ -10,12 +11,12 @@ interface FormData {
   paymentMethod: string;
 }
 
-const Checkout: React.FC = () => {
+const Checkout: React.FC = ({ paymentMethods, deliveryMethods }: { paymentMethods: string[], deliveryMethods: string[] }) => {
   const { post, data, setData } = useForm<Record<string, string>>({
     name: '',
     address: '',
     courier: 'Inpost',
-    paymentMethod: 'Przelewy24',
+    paymentMethod: '',
   });
 
   const [step, setStep] = useState(1);
@@ -66,25 +67,22 @@ const Checkout: React.FC = () => {
         {step === 2 && (
           <div className="space-y-4">
             <select
-              name="courier"
+              name="deliveryMethod"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="Inpost">Inpost</option>
-              <option value="DHL">DHL</option>
-              <option value="DPD">DPD</option>
-              <option value="Orlen Paczka">Orlen Paczka</option>
+              {deliveryMethods.map((method, index) => (
+                <option key={index} value={method}>{method}</option>
+              ))}
             </select>
             <select
               name="paymentMethod"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="Przelewy24">Przelewy24</option>
-              <option value="Apple Pay">Apple Pay</option>
-              <option value="Google Pay">Google Pay</option>
-              <option value="Blik">Blik</option>
-              <option value="Deferred Payment">Deferred Payment</option>
+              {paymentMethods.map((method, index) => (
+                <option key={index} value={method}>{method}</option>
+              ))}
             </select>
             <div className="flex justify-between">
               <button

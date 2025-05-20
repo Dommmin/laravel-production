@@ -1,5 +1,8 @@
 FROM dommin/php-8.4-fpm-alpine:latest
 
+ARG HTPASSWD_USER
+ARG HTPASSWD_PASS
+
 USER root
 
 RUN addgroup -g 1000 appuser && \
@@ -43,16 +46,12 @@ RUN mkdir -p \
 
 RUN ln -s /var/www/storage/app/public /var/www/public/storage
 
-# Declare build arguments
-ARG HTPASSWD_USER
-ARG HTPASSWD_PASS
+RUN echo "HTPASSWD_USER: ${HTPASSWD_USER}" && echo "HTPASSWD_PASS: ${HTPASSWD_PASS}"
 
-# Debug step to print environment variables
-RUN echo "HTPASSWD_USER: $HTPASSWD_USER" && echo "HTPASSWD_PASS: $HTPASSWD_PASS"
+RUN mkdir -p /etc/nginx
 
-# Install apache2-utils and create .htpasswd using secrets
 RUN apk update && apk add --no-cache apache2-utils \
-    && htpasswd -bc /etc/nginx/.htpasswd $HTPASSWD_USER $HTPASSWD_PASS
+    && htpasswd -bc /etc/nginx/.htpasswd "${HTPASSWD_USER}" "${HTPASSWD_PASS}"
 
 USER appuser
 

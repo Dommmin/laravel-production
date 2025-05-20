@@ -44,7 +44,7 @@ RUN mkdir -p \
 RUN ln -s /var/www/storage/app/public /var/www/public/storage
 
 # Install apache2-utils and create .htpasswd using secrets
-RUN apt-get update && apt-get install -y apache2-utils \
+RUN apk update && apk add --no-cache apache2-utils \
     && htpasswd -bc /etc/nginx/.htpasswd $HTPASSWD_USER $HTPASSWD_PASS
 
 USER appuser

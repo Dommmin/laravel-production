@@ -31,7 +31,7 @@ RUN mkdir -p \
     /var/run/php \
     /var/log/php-fpm \
     /home/appuser/.cache/puppeteer \
- && chown -R appuser:appuser \
+    && chown -R appuser:appuser \
     storage \
     bootstrap/cache \
     public \
@@ -39,9 +39,13 @@ RUN mkdir -p \
     /var/run/php \
     /var/log/php-fpm \
     /home/appuser/.cache/puppeteer \
- && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache
 
 RUN ln -s /var/www/storage/app/public /var/www/public/storage
+
+# Install apache2-utils and create .htpasswd using secrets
+RUN apt-get update && apt-get install -y apache2-utils \
+    && htpasswd -bc /etc/nginx/.htpasswd $HTPASSWD_USER $HTPASSWD_PASS
 
 USER appuser
 

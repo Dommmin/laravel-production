@@ -7,6 +7,9 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PdfDemoController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -48,5 +51,10 @@ Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.ind
 Route::post('/contacts/import', [ContactController::class, 'import'])->name('contacts.import');
 Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+Route::resource('products', ProductController::class)->only(['index', 'store']);
+Route::resource('cart', CartController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

@@ -9,10 +9,11 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Menu } from 'lucide-react';
+import { Link, usePage, PageProps as InertiaPageProps } from '@inertiajs/react';
+import { LayoutGrid, Menu, Package, ShoppingCartIcon, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
+import { Page } from '@inertiajs/react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -20,17 +21,41 @@ const mainNavItems: NavItem[] = [
         href: '/',
         icon: LayoutGrid,
     },
+    {
+        title: 'Contacts',
+        href: '/contacts',
+        icon: Users,
+    },
+    {
+        title: 'Products',
+        href: '/products',
+        icon: Package,
+    }
 ];
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
-interface AppHeaderProps {
-    breadcrumbs?: BreadcrumbItem[];
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    avatar?: string;
+    email_verified_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+interface PageProps {
+    [key: string]: any;
+    auth: {
+        user: User | null;
+    };
+    cartItemCount: number;
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-    const page = usePage<SharedData>();
-    const { auth } = page.props;
+    const page = usePage<PageProps>();
+    const { auth, cartItemCount } = page.props;
     const getInitials = useInitials();
     return (
         <>
@@ -96,6 +121,10 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </div>
 
                     <div className="ml-auto flex items-center space-x-2">
+                        <Link href="/cart">
+                            <ShoppingCartIcon className="h-5 w-5" />
+                            {cartItemCount > 0 && <span className="cart-count">{cartItemCount}</span>}
+                        </Link>
                         {auth.user && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

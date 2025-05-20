@@ -43,6 +43,10 @@ RUN mkdir -p \
 
 RUN ln -s /var/www/storage/app/public /var/www/public/storage
 
+# Declare build arguments
+ARG HTPASSWD_USER
+ARG HTPASSWD_PASS
+
 # Debug step to print environment variables
 RUN echo "HTPASSWD_USER: $HTPASSWD_USER" && echo "HTPASSWD_PASS: $HTPASSWD_PASS"
 

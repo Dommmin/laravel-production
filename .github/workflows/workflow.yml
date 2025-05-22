@@ -88,47 +88,47 @@ jobs:
             HTPASSWD_USER=${{ secrets.HTPASSWD_USER }}
             HTPASSWD_PASS=${{ secrets.HTPASSWD_PASS }}
 
-  deploy:
-    name: 🚀 Deploy to Production
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4 # Critical for accessing files!
-
-      - name: Setup SSH Authentication
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-
-      - name: Configure known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Prepare environment file
-        run: |
-          echo "${{ vars.ENV_FILE }}" > .env
-          {
-            echo "REGISTRY=${{ env.REGISTRY }}"
-            echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
-            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
-            echo "TAG=latest"
-          } >> .env
-
-      - name: Transfer deployment files
-        run: |
-          scp -P ${{ secrets.SSH_PORT }} \
-            docker-compose.production.yml \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
-
-          scp -P ${{ secrets.SSH_PORT }} \
-            .env deploy.sh \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/
-
-      - name: Trigger deployment script
-        run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "cd ~/laravel && chmod +x deploy.sh && ./deploy.sh"
+#  deploy:
+#    name: 🚀 Deploy to Production
+#    needs: build
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 15
+#
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4 # Critical for accessing files!
+#
+#      - name: Setup SSH Authentication
+#        uses: webfactory/ssh-agent@v0.9.1
+#        with:
+#          ssh-private-key: ${{ secrets.SSH_KEY }}
+#
+#      - name: Configure known_hosts
+#        run: |
+#          mkdir -p ~/.ssh
+#          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+#
+#      - name: Prepare environment file
+#        run: |
+#          echo "${{ vars.ENV_FILE }}" > .env
+#          {
+#            echo "REGISTRY=${{ env.REGISTRY }}"
+#            echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
+#            echo "NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }}"
+#            echo "TAG=latest"
+#          } >> .env
+#
+#      - name: Transfer deployment files
+#        run: |
+#          scp -P ${{ secrets.SSH_PORT }} \
+#            docker-compose.production.yml \
+#            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/docker-compose.yml
+#
+#          scp -P ${{ secrets.SSH_PORT }} \
+#            .env deploy.sh \
+#            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/laravel/
+#
+#      - name: Trigger deployment script
+#        run: |
+#          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+#            "cd ~/laravel && chmod +x deploy.sh && ./deploy.sh"

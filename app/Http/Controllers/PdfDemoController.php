@@ -16,8 +16,8 @@ class PdfDemoController extends Controller
     {
         $data = [
             'user' => [
-                'name' => 'Dominik Nowak',
-                'email' => 'dominik@example.com',
+                'name' => 'John Doe',
+                'email' => 'john@example.com',
             ],
             'items' => [
                 ['name' => 'Super Product', 'qty' => 2, 'price' => 199.99],
@@ -38,10 +38,10 @@ class PdfDemoController extends Controller
         $data = [
             'invoice_number' => 'FV/2024/05/001',
             'date' => now()->toDateString(),
-            'client' => 'Jan Kowalski',
+            'client' => 'Jane Doe',
             'items' => [
-                ['name' => 'Produkt A', 'qty' => 3, 'price' => 100],
-                ['name' => 'Produkt B', 'qty' => 1, 'price' => 250],
+                ['name' => 'Product A', 'qty' => 3, 'price' => 100],
+                ['name' => 'Product B', 'qty' => 1, 'price' => 250],
             ],
             'total' => 3 * 100 + 250,
         ];

@@ -1,8 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Invoice (DomPDF)</title>
+@extends('pdfs.layouts.pdf')
+
+@section('title', 'Invoice (Spatie Laravel PDF)')
+@section('styles')
     <style>
         body { font-family: DejaVu Sans, sans-serif; }
         table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
@@ -11,7 +10,8 @@
         .text-right { text-align: right; }
         .text-center { text-align: center; }
     </style>
-</head>
+@endsection
+@section('content')
 <body>
     <h2>INVOICE (DomPDF)</h2>
     <p>Invoice No: <strong>{{ $invoice_number }}</strong></p>
@@ -47,4 +47,4 @@
     </table>
     <p style="font-size: 10px; color: #888;">Generated automatically by barryvdh/laravel-dompdf</p>
 </body>
-</html> 
+@endsection

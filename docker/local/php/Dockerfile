@@ -1,8 +1,5 @@
 FROM dommin/php-8.4-fpm:latest
 
-# Install chokidar for file watching
-RUN npm install -g chokidar
-
 COPY docker/local/start.sh /usr/local/bin/start.sh
 
 USER root
@@ -15,4 +12,3 @@ WORKDIR /var/www
 USER www-data
 
 EXPOSE 9000
-EXPOSE 8000

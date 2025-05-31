@@ -52,7 +52,7 @@ Route::post('/contacts/import', [ContactController::class, 'import'])->name('con
 Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
 
 Route::resource('products', ProductController::class)->only(['index', 'store']);
-Route::resource('cart', CartController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::resource('cart', CartController::class)->only(['index', 'store', 'update', 'destroy'])->middleware(['auth']);
 Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 

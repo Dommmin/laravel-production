@@ -23,8 +23,10 @@ class CartController extends Controller
 
         $cartItem = Cart::updateOrCreate(
             ['user_id' => auth()->id()],
-            ['product_id' => $request->product_id],
-            ['quantity' => $request->quantity]
+            [
+                'product_id' => $request->product_id,
+                'quantity' => $request->quantity
+            ],
         );
 
         return redirect()->route('cart.index');

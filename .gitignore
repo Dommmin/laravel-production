@@ -42,3 +42,4 @@ docker/local/nginx/log/
 .pki/
 
 stubs/
+/.cursorignore

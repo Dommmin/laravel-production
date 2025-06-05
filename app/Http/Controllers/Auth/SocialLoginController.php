@@ -28,7 +28,6 @@ class SocialLoginController extends Controller
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_token' => $googleUser->token,
-                    'google_refresh_token' => $googleUser->refreshToken,
                     'password' => bcrypt(Str::random(24)),
                 ]
             );

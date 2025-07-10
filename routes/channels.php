@@ -15,3 +15,7 @@ Broadcast::channel('chat.{recipientId}', function ($user, $recipientId): bool {
 Broadcast::channel('imports', function ($user) {
     return true;
 });
+
+Broadcast::channel('clicks', function ($user) {
+    return true;
+});

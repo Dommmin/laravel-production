@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ClickController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PdfDemoController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\WebsocketController;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +57,9 @@ Route::resource('products', ProductController::class)->only(['index', 'store']);
 Route::resource('cart', CartController::class)->only(['index', 'store', 'update', 'destroy'])->middleware(['auth']);
 Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/clicks', [ClickController::class, 'index'])->name('clicks.index');
+Route::post('/clicks', [ClickController::class, 'click'])->name('clicks.click');
+Route::post('/clicks/reset', [ClickController::class, 'reset'])->name('clicks.reset');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

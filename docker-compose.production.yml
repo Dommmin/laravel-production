@@ -9,8 +9,6 @@ services:
       - ./.env:/var/www/.env
     networks:
       - laravel_network
-    ports:
-      - "8080:8080"
     depends_on:
       - redis
 
@@ -61,7 +59,6 @@ services:
     restart: unless-stopped
     ports:
       - '80:80'
-      - '8080:8080'
       - '443:443'
     volumes:
       - laravel_storage:/var/www/storage

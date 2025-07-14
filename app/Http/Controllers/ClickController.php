@@ -22,7 +22,7 @@ class ClickController extends Controller
     {
         Click::firstOrCreate()->increment('times');
 
-        broadcast(new ClickEvent());
+        event(new ClickEvent());
 
         return redirect()->route('clicks.index');
     }

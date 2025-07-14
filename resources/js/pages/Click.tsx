@@ -13,7 +13,7 @@ export default function Click({ click }: { click: ClickProps }) {
         const channel = window.Echo.channel('clicks');
 
         channel.listen('.Clicked', () => {
-            console.log('Click event');
+            alert('Click event');
             router.reload({ only: ['click'] });
         })
 

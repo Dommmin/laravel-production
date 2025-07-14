@@ -3,8 +3,7 @@ services:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_app
     restart: unless-stopped
-    working_dir: /var/www
-    env_file: .env
+    command: php-fpm
     volumes:
       - laravel_storage:/var/www/storage
       - ./.env:/var/www/.env
@@ -15,12 +14,54 @@ services:
     depends_on:
       - redis
 
+  queue:
+    image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
+    volumes:
+      - .:/var/www
+    command: php artisan queue:work --verbose --tries=3 --timeout=60
+    depends_on:
+      - app
+      - redis
+
+  scheduler:
+    image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
+    container_name: laravel_scheduler
+    restart: unless-stopped
+    entrypoint: ["sh", "-c", "while :; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
+    depends_on:
+      - app
+    volumes:
+      - .:/var/www
+    networks:
+      - laravel_network
+
+  reverb:
+    image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
+    container_name: laravel_reverb
+    restart: unless-stopped
+    env_file: .env
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    ports:
+      - "6001:8080"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - redis
+    networks:
+      - laravel_network
+
   nginx:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_nginx
     restart: unless-stopped
     ports:
       - '80:80'
+      - '8080:8080'
       - '443:443'
     volumes:
       - laravel_storage:/var/www/storage

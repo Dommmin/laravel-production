@@ -17,7 +17,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 COPY --chown=appuser:appuser . .
 COPY --chown=appuser:appuser --from=node /var/www/public/build /var/www/public/build
-COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
+#COPY --chown=appuser:appuser docker/supervisord.conf /etc/supervisord.conf
 COPY --chown=appuser:appuser docker/php/php.ini /usr/local/etc/php/php.ini
 COPY --chown=appuser:appuser docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
@@ -45,6 +45,4 @@ RUN ln -s /var/www/storage/app/public /var/www/public/storage
 
 USER appuser
 
-EXPOSE 9000
-
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
+#CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]

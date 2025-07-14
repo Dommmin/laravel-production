@@ -1,7 +1,7 @@
 services:
-  app:
+  web:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
-    container_name: laravel_app
+    container_name: laravel_web
     restart: unless-stopped
     working_dir: /var/www
     env_file: .env
@@ -27,7 +27,7 @@ services:
     networks:
       - laravel_network
     depends_on:
-      - app
+      - web
 
   redis:
     image: redis:alpine

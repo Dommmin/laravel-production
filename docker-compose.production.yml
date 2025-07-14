@@ -14,8 +14,8 @@ services:
 
   queue:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
-    volumes:
-      - .:/var/www
+    container_name: laravel_queue
+    restart: unless-stopped
     command: php artisan queue:work --verbose --tries=3 --timeout=60
     depends_on:
       - app
@@ -28,8 +28,6 @@ services:
     entrypoint: ["sh", "-c", "while :; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
     depends_on:
       - app
-    volumes:
-      - .:/var/www
     networks:
       - laravel_network
 
@@ -46,8 +44,6 @@ services:
       retries: 3
     ports:
       - "6001:8080"
-    volumes:
-      - .:/var/www
     depends_on:
       - redis
     networks:

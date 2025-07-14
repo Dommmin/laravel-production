@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ClickEvent implements ShouldBroadcast
+class ClickEvent implements ShouldBroadcastNow
 {
     use Dispatchable;
     use InteractsWithSockets;

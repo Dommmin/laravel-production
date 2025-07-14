@@ -16,7 +16,7 @@ services:
     image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
     container_name: laravel_worker
     restart: unless-stopped
-    command: php artisan queue:work --verbose --tries=3 --timeout=60
+    command: php artisan queue:work --tries=3 --timeout=60
     volumes:
       - ./.env:/var/www/.env
     networks:

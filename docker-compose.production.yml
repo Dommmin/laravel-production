@@ -62,6 +62,7 @@ services:
       - laravel_network
     depends_on:
       - app
+      - reverb
 
   redis:
     image: redis:alpine

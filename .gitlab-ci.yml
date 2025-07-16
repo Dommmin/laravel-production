@@ -5,10 +5,6 @@ stages:
   - deploy
 
 variables:
-  REGISTRY: ghcr.io
-  NODE_IMAGE_NAME: dommmin/laravel-production-node-builder
-  PHP_IMAGE_NAME: dommmin/laravel-production-php
-  NGINX_IMAGE_NAME: dommmin/laravel-production-nginx
   DOCKER_BUILDKIT: 1
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
@@ -18,7 +14,7 @@ services:
 
 before_script:
   - docker info
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $REGISTRY
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
 build_node:
   stage: build
@@ -33,7 +29,7 @@ build_node:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
-        --tag $REGISTRY/$NODE_IMAGE_NAME:latest \
+        --tag $CI_REGISTRY_IMAGE-node-builder:latest \
         --push \
         .
 
@@ -47,9 +43,9 @@ build_php:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
-        --tag $REGISTRY/$PHP_IMAGE_NAME:latest \
+        --tag $CI_REGISTRY_IMAGE-php:latest \
         --push \
-        --build-context node=docker-image://$REGISTRY/$NODE_IMAGE_NAME:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE-node-builder:latest \
         .
 
 build_nginx:
@@ -62,9 +58,9 @@ build_nginx:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
-        --tag $REGISTRY/$NGINX_IMAGE_NAME:latest \
+        --tag $CI_REGISTRY_IMAGE-nginx:latest \
         --push \
-        --build-context node=docker-image://$REGISTRY/$NODE_IMAGE_NAME:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE-node-builder:latest \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
@@ -82,9 +78,10 @@ deploy_production:
   script:
     - echo "$ENV_FILE" > .env
     - |
-      echo "REGISTRY=$REGISTRY" >> .env
-      echo "PHP_IMAGE_NAME=$PHP_IMAGE_NAME" >> .env
-      echo "NGINX_IMAGE_NAME=$NGINX_IMAGE_NAME" >> .env
+      echo "CI_REGISTRY=$CI_REGISTRY" >> .env
+      echo "NODE_IMAGE_NAME=$CI_REGISTRY_IMAGE-node-builder" >> .env
+      echo "PHP_IMAGE_NAME=$CI_REGISTRY_IMAGE-php" >> .env
+      echo "NGINX_IMAGE_NAME=$CI_REGISTRY_IMAGE-nginx" >> .env
       echo "TAG=latest" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml
     - scp -P $SSH_PORT .env deploy.sh $SSH_USER@$SSH_HOST:~/laravel/

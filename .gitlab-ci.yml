@@ -29,7 +29,7 @@ build_node:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE-node-builder:latest \
+        --tag $CI_REGISTRY_IMAGE:node-builder \
         --push \
         .
 
@@ -43,9 +43,9 @@ build_php:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE-php:latest \
+        --tag $CI_REGISTRY_IMAGE:php \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY_IMAGE-node-builder:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
         .
 
 build_nginx:
@@ -58,9 +58,9 @@ build_nginx:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE-nginx:latest \
+        --tag $CI_REGISTRY_IMAGE:nginx \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY_IMAGE-node-builder:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
@@ -79,9 +79,9 @@ deploy_production:
     - echo "$ENV_FILE" > .env
     - |
       echo "CI_REGISTRY=$CI_REGISTRY" >> .env
-      echo "NODE_IMAGE_NAME=$CI_REGISTRY_IMAGE-node-builder" >> .env
-      echo "PHP_IMAGE_NAME=$CI_REGISTRY_IMAGE-php" >> .env
-      echo "NGINX_IMAGE_NAME=$CI_REGISTRY_IMAGE-nginx" >> .env
+      echo "NODE_IMAGE_NAME=$CI_REGISTRY_IMAGE:node-builder" >> .env
+      echo "PHP_IMAGE_NAME=$CI_REGISTRY_IMAGE:php" >> .env
+      echo "NGINX_IMAGE_NAME=$CI_REGISTRY_IMAGE:nginx" >> .env
       echo "TAG=latest" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml
     - scp -P $SSH_PORT .env deploy.sh $SSH_USER@$SSH_HOST:~/laravel/

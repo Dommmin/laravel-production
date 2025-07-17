@@ -15,6 +15,7 @@ services:
 
 before_script:
   - docker info
+  - docker buildx create --use || true  # Nie crashuje jeśli już istnieje
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
 build_node:
@@ -24,12 +25,13 @@ build_node:
     - mkdir -p docker/node docker/php
     - cat "$ENV_FILE" > docker/node/.env
     - cat "$ENV_FILE" > docker/php/.env
-    - docker buildx create --use
     - docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
         --tag $CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
         --push \
+        --no-cache \
+        --progress=plain \
         .
 
 build_php:
@@ -37,13 +39,14 @@ build_php:
   image: docker:24.0.5
   needs: [build_node]
   script:
-    - docker buildx create --use
     - docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
         --tag $CI_REGISTRY/$IMAGE_NAMESPACE/php:latest \
         --push \
         --build-context node=docker-image://$CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
+        --no-cache \
+        --progress=plain \
         .
 
 build_nginx:
@@ -51,7 +54,6 @@ build_nginx:
   image: docker:24.0.5
   needs: [build_node]
   script:
-    - docker buildx create --use
     - docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
@@ -60,6 +62,8 @@ build_nginx:
         --build-context node=docker-image://$CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
+        --no-cache \
+        --progress=plain \
         .
 
 deploy_production:

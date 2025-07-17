@@ -5,20 +5,18 @@ stages:
   - deploy
 
 variables:
-  REGISTRY: ghcr.io
-  NODE_IMAGE_NAME: dommmin/laravel-production-node-builder
-  PHP_IMAGE_NAME: dommmin/laravel-production-php
-  NGINX_IMAGE_NAME: dommmin/laravel-production-nginx
   DOCKER_BUILDKIT: 1
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
+  IMAGE_NAMESPACE: dommmin/laravel-production
+  REGISTRY: registry.gitlab.com
 
 services:
   - docker:dind
 
 before_script:
   - docker info
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $REGISTRY
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
 build_node:
   stage: build
@@ -28,12 +26,11 @@ build_node:
     - mkdir -p docker/node docker/php
     - echo "$ENV_FILE" > docker/node/.env
     - echo "$ENV_FILE" > docker/php/.env
-    - cat docker/node/.env
     - |
       docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
-        --tag $REGISTRY/$NODE_IMAGE_NAME:latest \
+        --tag $REGISTRY/$IMAGE_NAMESPACE/node:latest \
         --push \
         .
 
@@ -47,9 +44,9 @@ build_php:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
-        --tag $REGISTRY/$PHP_IMAGE_NAME:latest \
+        --tag $REGISTRY/$IMAGE_NAMESPACE/php:latest \
         --push \
-        --build-context node=docker-image://$REGISTRY/$NODE_IMAGE_NAME:latest \
+        --build-context node=docker-image://$REGISTRY/$IMAGE_NAMESPACE/node:latest \
         .
 
 build_nginx:
@@ -62,9 +59,9 @@ build_nginx:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
-        --tag $REGISTRY/$NGINX_IMAGE_NAME:latest \
+        --tag $REGISTRY/$IMAGE_NAMESPACE/nginx:latest \
         --push \
-        --build-context node=docker-image://$REGISTRY/$NODE_IMAGE_NAME:latest \
+        --build-context node=docker-image://$REGISTRY/$IMAGE_NAMESPACE/node:latest \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
@@ -80,12 +77,17 @@ deploy_production:
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -p $SSH_PORT $SSH_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "$ENV_FILE" > .env
+    - cat "$ENV_FILE" > .env
+    - echo >> .env
     - |
       echo "REGISTRY=$REGISTRY" >> .env
-      echo "PHP_IMAGE_NAME=$PHP_IMAGE_NAME" >> .env
-      echo "NGINX_IMAGE_NAME=$NGINX_IMAGE_NAME" >> .env
+      echo "IMAGE_NAMESPACE=$IMAGE_NAMESPACE" >> .env
+      echo "NODE_IMAGE_NAME=$IMAGE_NAMESPACE/node" >> .env
+      echo "PHP_IMAGE_NAME=$IMAGE_NAMESPACE/php" >> .env
+      echo "NGINX_IMAGE_NAME=$IMAGE_NAMESPACE/nginx" >> .env
       echo "TAG=latest" >> .env
+      echo "CI_REGISTRY_USER=$CI_REGISTRY_USER" >> .env
+      echo "CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml
     - scp -P $SSH_PORT .env deploy.sh $SSH_USER@$SSH_HOST:~/laravel/
     - ssh -p $SSH_PORT $SSH_USER@$SSH_HOST "cd ~/laravel && chmod +x deploy.sh && ./deploy.sh"

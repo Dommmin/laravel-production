@@ -8,6 +8,7 @@ variables:
   DOCKER_BUILDKIT: 1
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
+  IMAGE_NAMESPACE: $(echo "$CI_PROJECT_PATH" | tr '[:upper:]' '[:lower:]')
 
 services:
   - docker:dind
@@ -29,7 +30,7 @@ build_node:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
-        --tag $CI_REGISTRY/$CI_PROJECT_PATH/node:latest \
+        --tag $CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
         --push \
         .
 
@@ -43,9 +44,9 @@ build_php:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
-        --tag $CI_REGISTRY/$CI_PROJECT_PATH/php:latest \
+        --tag $CI_REGISTRY/$IMAGE_NAMESPACE/php:latest \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY/$CI_PROJECT_PATH/node:latest \
+        --build-context node=docker-image://$CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
         .
 
 build_nginx:
@@ -58,9 +59,9 @@ build_nginx:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
-        --tag $CI_REGISTRY/$CI_PROJECT_PATH/nginx:latest \
+        --tag $CI_REGISTRY/$IMAGE_NAMESPACE/nginx:latest \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY/$CI_PROJECT_PATH/node:latest \
+        --build-context node=docker-image://$CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
@@ -80,10 +81,10 @@ deploy_production:
     - echo >> .env
     - |
       echo "REGISTRY=$CI_REGISTRY" >> .env
-      echo "IMAGE_NAMESPACE=$CI_PROJECT_PATH" >> .env
-      echo "NODE_IMAGE_NAME=$CI_PROJECT_PATH/node" >> .env
-      echo "PHP_IMAGE_NAME=$CI_PROJECT_PATH/php" >> .env
-      echo "NGINX_IMAGE_NAME=$CI_PROJECT_PATH/nginx" >> .env
+      echo "$IMAGE_NAMESPACE" >> .env
+      echo "NODE_IMAGE_NAME=$IMAGE_NAMESPACE/node" >> .env
+      echo "PHP_IMAGE_NAME=$IMAGE_NAMESPACE/php" >> .env
+      echo "NGINX_IMAGE_NAME=$IMAGE_NAMESPACE/nginx" >> .env
       echo "TAG=latest" >> .env
       echo "CI_REGISTRY_USER=$CI_REGISTRY_USER" >> .env
       echo "CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" >> .env

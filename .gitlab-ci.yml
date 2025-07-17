@@ -78,10 +78,11 @@ deploy_production:
   script:
     - echo "$ENV_FILE" > .env
     - |
-      echo "CI_REGISTRY=$CI_REGISTRY" >> .env
-      echo "NODE_IMAGE_NAME=$CI_REGISTRY_IMAGE:node-builder" >> .env
-      echo "PHP_IMAGE_NAME=$CI_REGISTRY_IMAGE:php" >> .env
-      echo "NGINX_IMAGE_NAME=$CI_REGISTRY_IMAGE:nginx" >> .env
+      echo "REGISTRY=registry.gitlab.com" >> .env
+      echo "IMAGE_NAMESPACE=dommmin/laravel-production" >> .env
+      echo "NODE_TAG=node-builder" >> .env
+      echo "PHP_TAG=php" >> .env
+      echo "NGINX_TAG=nginx" >> .env
       echo "TAG=latest" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml
     - scp -P $SSH_PORT .env deploy.sh $SSH_USER@$SSH_HOST:~/laravel/

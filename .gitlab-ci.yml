@@ -29,7 +29,7 @@ build_node:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE:node-builder \
+        --tag $CI_REGISTRY_IMAGE:latest \
         --push \
         .
 
@@ -43,9 +43,9 @@ build_php:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE:php \
+        --tag $CI_REGISTRY_IMAGE:latest \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:latest \
         .
 
 build_nginx:
@@ -58,9 +58,9 @@ build_nginx:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE:nginx \
+        --tag $CI_REGISTRY_IMAGE:latest \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:latest \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
@@ -81,13 +81,13 @@ deploy_production:
     - |
       echo "REGISTRY=registry.gitlab.com" >> .env
       echo "IMAGE_NAMESPACE=dommmin/laravel-production" >> .env
-      echo "NODE_TAG=node-builder" >> .env
-      echo "PHP_TAG=php" >> .env
-      echo "NGINX_TAG=nginx" >> .env
+      echo "NODE_TAG=latest" >> .env
+      echo "PHP_TAG=latest" >> .env
+      echo "NGINX_TAG=latest" >> .env
       echo "TAG=latest" >> .env
-      echo "NODE_IMAGE_NAME=dommmin/laravel-production" >> .env
-      echo "PHP_IMAGE_NAME=dommmin/laravel-production" >> .env
-      echo "NGINX_IMAGE_NAME=dommmin/laravel-production" >> .env
+      echo "NODE_IMAGE_NAME=dommmin/laravel-production-node" >> .env
+      echo "PHP_IMAGE_NAME=dommmin/laravel-production-php" >> .env
+      echo "NGINX_IMAGE_NAME=dommmin/laravel-production-nginx" >> .env
       echo "CI_REGISTRY_USER=$CI_REGISTRY_USER" >> .env
       echo "CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml

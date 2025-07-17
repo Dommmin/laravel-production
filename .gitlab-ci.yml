@@ -29,7 +29,7 @@ build_node:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE:latest \
+        --tag $CI_REGISTRY_IMAGE:node-builder \
         --push \
         .
 
@@ -43,9 +43,9 @@ build_php:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE:latest \
+        --tag $CI_REGISTRY_IMAGE:php \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY_IMAGE:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
         .
 
 build_nginx:
@@ -58,9 +58,9 @@ build_nginx:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
-        --tag $CI_REGISTRY_IMAGE:latest \
+        --tag $CI_REGISTRY_IMAGE:nginx \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY_IMAGE:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
@@ -81,9 +81,9 @@ deploy_production:
     - |
       echo "REGISTRY=registry.gitlab.com" >> .env
       echo "IMAGE_NAMESPACE=dommmin/laravel-production" >> .env
-      echo "NODE_TAG=latest" >> .env
-      echo "PHP_TAG=latest" >> .env
-      echo "NGINX_TAG=latest" >> .env
+      echo "NODE_TAG=node-builder" >> .env
+      echo "PHP_TAG=php" >> .env
+      echo "NGINX_TAG=nginx" >> .env
       echo "TAG=latest" >> .env
       echo "NODE_IMAGE_NAME=dommmin/laravel-production" >> .env
       echo "PHP_IMAGE_NAME=dommmin/laravel-production" >> .env

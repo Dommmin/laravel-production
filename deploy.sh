@@ -7,6 +7,11 @@ set -eo pipefail
 echo "🚀 Starting production deployment..."
 echo "🕒 $(date)"
 
+# # Login to GitLab Container Registry if credentials are present in .env
+# grep -q CI_REGISTRY_USER .env && grep -q CI_REGISTRY_PASSWORD .env && \
+#   source .env && \
+#   docker login registry.gitlab.com -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+
 # Pull latest images
 echo "📥 Pulling updated Docker images..."
 docker compose pull

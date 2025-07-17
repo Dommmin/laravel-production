@@ -24,8 +24,8 @@ build_node:
   script:
     - docker buildx create --use
     - mkdir -p docker/node docker/php
-    - echo "$ENV_FILE" > docker/node/.env
-    - echo "$ENV_FILE" > docker/php/.env
+    - cat "$ENV_FILE" > docker/node/.env
+    - cat "$ENV_FILE" > docker/php/.env
     - |
       docker buildx build \
         --platform linux/amd64 \

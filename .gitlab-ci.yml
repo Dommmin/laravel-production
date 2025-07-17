@@ -84,9 +84,9 @@ deploy_production:
       echo "PHP_TAG=php" >> .env
       echo "NGINX_TAG=nginx" >> .env
       echo "TAG=latest" >> .env
-      echo "NODE_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production:node-builder" >> .env
-      echo "PHP_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production:php" >> .env
-      echo "NGINX_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production:nginx" >> .env
+      echo "NODE_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production" >> .env
+      echo "PHP_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production" >> .env
+      echo "NGINX_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml
     - scp -P $SSH_PORT .env deploy.sh $SSH_USER@$SSH_HOST:~/laravel/
     - ssh -p $SSH_PORT $SSH_USER@$SSH_HOST "cd ~/laravel && chmod +x deploy.sh && ./deploy.sh"

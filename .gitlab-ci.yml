@@ -8,12 +8,12 @@ variables:
   DOCKER_BUILDKIT: 1
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
+  IMAGE_NAMESPACE: dommmin/laravel-production
 
 services:
   - docker:dind
 
 before_script:
-  - export IMAGE_NAMESPACE=$(echo "$CI_PROJECT_PATH" | tr '[:upper:]' '[:lower:]')
   - docker info
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 

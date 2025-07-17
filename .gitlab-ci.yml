@@ -15,7 +15,7 @@ services:
 before_script:
   - export IMAGE_NAMESPACE=$(echo "$CI_PROJECT_PATH" | tr '[:upper:]' '[:lower:]')
   - docker info
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
 build_node:
   stage: build
@@ -24,9 +24,8 @@ build_node:
     - mkdir -p docker/node docker/php
     - cat "$ENV_FILE" > docker/node/.env
     - cat "$ENV_FILE" > docker/php/.env
-    - |
-      docker buildx create --use
-      docker buildx build \
+    - docker buildx create --use
+    - docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
         --tag $CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
@@ -39,8 +38,7 @@ build_php:
   needs: [build_node]
   script:
     - docker buildx create --use
-    - |
-      docker buildx build \
+    - docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
         --tag $CI_REGISTRY/$IMAGE_NAMESPACE/php:latest \
@@ -54,8 +52,7 @@ build_nginx:
   needs: [build_node]
   script:
     - docker buildx create --use
-    - |
-      docker buildx build \
+    - docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
         --tag $CI_REGISTRY/$IMAGE_NAMESPACE/nginx:latest \
@@ -74,7 +71,7 @@ deploy_production:
     - mkdir -p ~/.ssh
     - echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -p $SSH_PORT $SSH_HOST >> ~/.ssh/known_hosts
+    - ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
   script:
     - cat "$ENV_FILE" > .env
     - echo >> .env
@@ -87,8 +84,8 @@ deploy_production:
       echo "NGINX_IMAGE_NAME=$IMAGE_NAMESPACE/nginx" >> .env
       echo "CI_REGISTRY_USER=$CI_REGISTRY_USER" >> .env
       echo "CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" >> .env
-    - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml
-    - scp -P $SSH_PORT .env deploy.sh $SSH_USER@$SSH_HOST:~/laravel/
-    - ssh -p $SSH_PORT $SSH_USER@$SSH_HOST "cd ~/laravel && chmod +x deploy.sh && ./deploy.sh"
+    - scp -P "$SSH_PORT" docker-compose.production.yml "$SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml"
+    - scp -P "$SSH_PORT" .env deploy.sh "$SSH_USER@$SSH_HOST:~/laravel/"
+    - ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "cd ~/laravel && chmod +x deploy.sh && ./deploy.sh"
   only:
     - main

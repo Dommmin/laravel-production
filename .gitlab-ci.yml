@@ -23,8 +23,8 @@ build_node:
   script:
     - docker buildx create --use
     - mkdir -p docker/node docker/php
-    - echo "$ENV_FILE" > docker/node/.env
-    - echo "$ENV_FILE" > docker/php/.env
+    - cat "$ENV_FILE" > docker/node/.env
+    - cat "$ENV_FILE" > docker/php/.env
     - cat docker/node/.env
     - |
       docker buildx build \
@@ -81,7 +81,7 @@ deploy_production:
     - echo >> .env
     - |
       echo "REGISTRY=$CI_REGISTRY" >> .env
-      echo "$IMAGE_NAMESPACE" >> .env
+      echo "IMAGE_NAMESPACE=$IMAGE_NAMESPACE" >> .env
       echo "NODE_IMAGE_NAME=$IMAGE_NAMESPACE/node" >> .env
       echo "PHP_IMAGE_NAME=$IMAGE_NAMESPACE/php" >> .env
       echo "NGINX_IMAGE_NAME=$IMAGE_NAMESPACE/nginx" >> .env

@@ -77,6 +77,7 @@ deploy_production:
     - ssh-keyscan -p $SSH_PORT $SSH_HOST >> ~/.ssh/known_hosts
   script:
     - cat "$ENV_FILE" > .env
+    - echo >> .env
     - |
       echo "REGISTRY=registry.gitlab.com" >> .env
       echo "IMAGE_NAMESPACE=dommmin/laravel-production" >> .env

@@ -25,12 +25,11 @@ build_node:
     - mkdir -p docker/node docker/php
     - cat "$ENV_FILE" > docker/node/.env
     - cat "$ENV_FILE" > docker/php/.env
-    - cat docker/node/.env
     - |
       docker buildx build \
         --platform linux/amd64 \
         --file docker/node/Dockerfile \
-        --tag $CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
+        --tag $CI_REGISTRY_IMAGE:node-builder \
         --push \
         .
 
@@ -44,9 +43,9 @@ build_php:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/php/Dockerfile \
-        --tag $CI_REGISTRY/$IMAGE_NAMESPACE/php:latest \
+        --tag $CI_REGISTRY_IMAGE:php \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
         .
 
 build_nginx:
@@ -59,9 +58,9 @@ build_nginx:
       docker buildx build \
         --platform linux/amd64 \
         --file docker/nginx/Dockerfile \
-        --tag $CI_REGISTRY/$IMAGE_NAMESPACE/nginx:latest \
+        --tag $CI_REGISTRY_IMAGE:nginx \
         --push \
-        --build-context node=docker-image://$CI_REGISTRY/$IMAGE_NAMESPACE/node:latest \
+        --build-context node=docker-image://$CI_REGISTRY_IMAGE:node-builder \
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
@@ -80,12 +79,12 @@ deploy_production:
     - cat "$ENV_FILE" > .env
     - echo >> .env
     - |
-      echo "REGISTRY=$CI_REGISTRY" >> .env
+      echo "REGISTRY=registry.gitlab.com" >> .env
       echo "IMAGE_NAMESPACE=$IMAGE_NAMESPACE" >> .env
+      echo "TAG=latest" >> .env
       echo "NODE_IMAGE_NAME=$IMAGE_NAMESPACE/node" >> .env
       echo "PHP_IMAGE_NAME=$IMAGE_NAMESPACE/php" >> .env
       echo "NGINX_IMAGE_NAME=$IMAGE_NAMESPACE/nginx" >> .env
-      echo "TAG=latest" >> .env
       echo "CI_REGISTRY_USER=$CI_REGISTRY_USER" >> .env
       echo "CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml

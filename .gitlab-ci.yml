@@ -87,6 +87,8 @@ deploy_production:
       echo "NODE_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production" >> .env
       echo "PHP_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production" >> .env
       echo "NGINX_IMAGE_NAME=registry.gitlab.com/dommmin/laravel-production" >> .env
+      echo "CI_REGISTRY_USER=$CI_REGISTRY_USER" >> .env
+      echo "CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" >> .env
     - scp -P $SSH_PORT docker-compose.production.yml $SSH_USER@$SSH_HOST:~/laravel/docker-compose.yml
     - scp -P $SSH_PORT .env deploy.sh $SSH_USER@$SSH_HOST:~/laravel/
     - ssh -p $SSH_PORT $SSH_USER@$SSH_HOST "cd ~/laravel && chmod +x deploy.sh && ./deploy.sh"

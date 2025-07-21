@@ -10,7 +10,12 @@ interface FormData {
     paymentMethod: string;
 }
 
-const Checkout: React.FC = ({ paymentMethods, deliveryMethods }: { paymentMethods: string[]; deliveryMethods: string[] }) => {
+interface CheckoutProps {
+    paymentMethods: string[];
+    deliveryMethods: string[];
+}
+
+const Checkout = ({ paymentMethods, deliveryMethods }: CheckoutProps) => {
     const { post, data, setData } = useForm<Record<string, string>>({
         name: '',
         address: '',

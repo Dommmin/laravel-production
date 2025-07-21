@@ -53,13 +53,13 @@ return new class extends Migration
         $admin = User::create([
             'email' => 'admin@example.com',
             'name' => 'Admin',
-            'password' => bcrypt('Pa$$w0rd!')
+            'password' => bcrypt('Pa$$w0rd!'),
         ]);
 
         $user = User::create([
             'email' => 'user@example.com',
             'name' => 'User',
-            'password' => bcrypt('Pa$$w0rd!')
+            'password' => bcrypt('Pa$$w0rd!'),
         ]);
 
         $chat = Chat::create();

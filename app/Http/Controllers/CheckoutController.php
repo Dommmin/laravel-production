@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Models\Order;
-use App\Models\Cart;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CheckoutController extends Controller
 {
@@ -33,7 +33,7 @@ class CheckoutController extends Controller
         return Inertia::render('Checkout/Index', [
             'cartItems' => $cartItems,
             'paymentMethods' => $paymentMethods,
-            'deliveryMethods' => $deliveryMethods
+            'deliveryMethods' => $deliveryMethods,
         ]);
     }
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCartRequest;
 use App\Http\Requests\UpdateCartRequest;
-use Illuminate\Http\Request;
 use App\Models\Cart;
 use Inertia\Inertia;
 
@@ -13,6 +12,7 @@ class CartController extends Controller
     public function index()
     {
         $cartItems = Cart::with('product')->get();
+
         return Inertia::render('Cart/Index', ['cartItems' => $cartItems]);
     }
 

@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Laravel\Socialite\Two\User as SocialiteUser;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SocialLoginController extends Controller
 {
@@ -38,7 +38,8 @@ class SocialLoginController extends Controller
 
             return redirect()->intended(route('home'));
         } catch (\Exception $e) {
-            Log::error('Google authentication failed: ' . $e->getMessage());
+            Log::error('Google authentication failed: '.$e->getMessage());
+
             return redirect()->route('login')->with('error', 'Google authentication failed');
         }
     }
@@ -68,7 +69,8 @@ class SocialLoginController extends Controller
 
             return redirect()->intended(route('home'));
         } catch (\Exception $e) {
-            Log::error('Facebook authentication failed: ' . $e->getMessage());
+            Log::error('Facebook authentication failed: '.$e->getMessage());
+
             return redirect()->route('login')->with('error', 'Facebook authentication failed');
         }
     }

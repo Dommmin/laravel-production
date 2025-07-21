@@ -22,7 +22,7 @@ class ImportJobFactory extends Factory
             'errors' => [],
             'total_rows' => $this->faker->numberBetween(0, 100),
             'processed_rows' => 0,
-            'filename' => $this->faker->word() . '.csv',
+            'filename' => $this->faker->word().'.csv',
         ];
     }
 

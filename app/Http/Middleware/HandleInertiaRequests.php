@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\Cart;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
-use App\Models\Cart;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -50,7 +50,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'cartItemCount' => Cart::count(),
-            'ziggy' => fn(): array => [
+            'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],

@@ -19,4 +19,4 @@ class ChatFactory extends Factory
             'name' => $this->faker->words(3, true),
         ];
     }
-} 
+}

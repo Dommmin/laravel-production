@@ -1,16 +1,17 @@
 image: docker:latest
 
 stages:
+  - test
   - build
   - deploy
-
+    
 variables:
   DOCKER_BUILDKIT: 1
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
   IMAGE_NAMESPACE: dommmin/laravel-production
   REGISTRY: registry.gitlab.com
-
+  
 services:
   - docker:dind
 
@@ -18,9 +19,61 @@ before_script:
   - docker info
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
+test_php:
+  stage: test
+  image: php:8.4-cli
+  before_script:
+    - apt-get update -yqq
+    - apt-get install -yqq git curl libpq-dev libcurl4-gnutls-dev libicu-dev libvpx-dev libjpeg-dev libpng-dev libxpm-dev zlib1g-dev libfreetype6-dev libxml2-dev libexpat1-dev libbz2-dev libgmp3-dev libldap2-dev unixodbc-dev libsqlite3-dev libaspell-dev libsnmp-dev libpcre3-dev libtidy-dev libzip-dev libmagickwand-dev
+    - docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring dom fileinfo zip gd intl
+    - pecl install redis imagick xdebug
+    - docker-php-ext-enable redis imagick xdebug
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
+  script:
+    - cp .env.testing .env
+    - php artisan key:generate
+    - php artisan ziggy:generate
+    - composer larastan
+    - composer pint
+    - ./vendor/bin/pest
+  variables:
+    DB_CONNECTION: sqlite
+    DB_DATABASE: ":memory:"
+    SESSION_DRIVER: array
+  artifacts:
+    reports:
+      junit: storage/logs/test-results.xml
+    paths:
+      - storage/logs/
+    expire_in: 1 week
+  only:
+    - main
+    - merge_requests
+
+test_node:
+  stage: test
+  image: node:22-alpine
+  before_script:
+    - npm ci
+    - npm run build
+  script:
+    - npm run format
+    - npm run types
+    - npm run lint
+  artifacts:
+    paths:
+      - node_modules/
+      - public/build/
+    expire_in: 1 hour
+  only:
+    - main
+    - merge_requests
+
 build_node:
   stage: build
   image: docker:24.0.5
+  needs: [test_node]
   script:
     - docker buildx create --use
     - mkdir -p docker/node docker/php
@@ -33,11 +86,13 @@ build_node:
         --tag $REGISTRY/$IMAGE_NAMESPACE/node:latest \
         --push \
         .
+  only:
+    - main
 
 build_php:
   stage: build
   image: docker:24.0.5
-  needs: [build_node]
+  needs: [test_php, build_node]
   script:
     - docker buildx create --use
     - |
@@ -48,11 +103,13 @@ build_php:
         --push \
         --build-context node=docker-image://$REGISTRY/$IMAGE_NAMESPACE/node:latest \
         .
+  only:
+    - main
 
 build_nginx:
   stage: build
   image: docker:24.0.5
-  needs: [build_node]
+  needs: [test_node, build_node]
   script:
     - docker buildx create --use
     - |
@@ -65,6 +122,8 @@ build_nginx:
         --build-arg HTPASSWD_USER=$HTPASSWD_USER \
         --build-arg HTPASSWD_PASS=$HTPASSWD_PASS \
         .
+  only:
+    - main
 
 deploy_production:
   stage: deploy

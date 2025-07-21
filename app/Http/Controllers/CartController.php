@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCartRequest;
+use App\Http\Requests\UpdateCartRequest;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use Inertia\Inertia;
@@ -14,31 +16,24 @@ class CartController extends Controller
         return Inertia::render('Cart/Index', ['cartItems' => $cartItems]);
     }
 
-    public function store(Request $request)
+    public function store(StoreCartRequest $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $cartItem = Cart::updateOrCreate(
             ['user_id' => auth()->id()],
             [
-                'product_id' => $request->product_id,
-                'quantity' => $request->quantity
+                'product_id' => $validated['product_id'],
+                'quantity' => $validated['quantity'],
             ],
         );
 
         return redirect()->route('cart.index');
     }
 
-    public function update(Request $request, Cart $cart)
+    public function update(UpdateCartRequest $request, Cart $cart)
     {
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $cart->update(['quantity' => $request->quantity]);
+        $cart->update($request->validated());
 
         return redirect()->route('cart.index');
     }

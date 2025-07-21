@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Cart;
@@ -45,11 +46,14 @@ class CheckoutController extends Controller
             'paymentMethod' => 'required|string',
         ]);
 
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () {
             $cartItems = Cart::with('product')->where('user_id', auth()->id())->get();
 
             $totalPrice = $cartItems->sum(function ($cartItem) {
-                return $cartItem->quantity * $cartItem->product->price;
+                /** @var Product $product */
+                $product = $cartItem->product;
+
+                return $cartItem->quantity * $product->price;
             });
 
             $order = Order::create([

@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Laravel\Socialite\Two\User as SocialiteUser;
 
 class SocialLoginController extends Controller
 {
@@ -20,6 +21,7 @@ class SocialLoginController extends Controller
     public function handleGoogleCallback(): RedirectResponse
     {
         try {
+            /** @var SocialiteUser $googleUser */
             $googleUser = Socialite::driver('google')->user();
 
             $user = User::updateOrCreate(
@@ -49,6 +51,7 @@ class SocialLoginController extends Controller
     public function handleFacebookCallback(): RedirectResponse
     {
         try {
+            /** @var SocialiteUser $facebookUser */
             $facebookUser = Socialite::driver('facebook')->user();
 
             $user = User::updateOrCreate(

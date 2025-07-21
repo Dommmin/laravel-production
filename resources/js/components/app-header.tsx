@@ -8,12 +8,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
-import { Link, usePage, PageProps as InertiaPageProps } from '@inertiajs/react';
-import { AirplayIcon, LayoutGrid, Menu, Package, ShoppingCartIcon, Users } from 'lucide-react';
+import { type NavItem } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { AirplayIcon, LayoutGrid, Menu, ShoppingCartIcon, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-import { Page } from '@inertiajs/react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -30,7 +29,7 @@ const mainNavItems: NavItem[] = [
         title: 'Clicks',
         href: '/clicks',
         icon: AirplayIcon,
-    }
+    },
     // {
     //     title: 'Products',
     //     href: '/products',

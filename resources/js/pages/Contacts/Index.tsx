@@ -41,7 +41,8 @@ export default function ContactsIndex({ contacts }: { contacts: ContactData }) {
     useEffect(() => {
         const channel = window.Echo.channel('imports');
 
-        channel.listen('.ContactImportFinished', () => {
+        channel
+            .listen('.ContactImportFinished', () => {
                 console.log('Contact import finished');
                 setImporting(false);
                 setImportErrors([]);

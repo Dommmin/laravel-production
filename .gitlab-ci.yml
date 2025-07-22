@@ -32,7 +32,7 @@ test_php:
     - php artisan ziggy:generate
     - composer larastan
     - composer pint
-    - composer pest
+    - php artisan test --env=testing
   variables:
     DB_CONNECTION: sqlite
     DB_DATABASE: ":memory:"

@@ -74,7 +74,7 @@ jobs:
       - name: Run Pint
         run: composer pint
       - name: Run Pest
-        run: composer pest
+        run: php artisan test --env=testing
 
   build:
     name: 🏗️ Build and Push Images

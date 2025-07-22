@@ -42,8 +42,6 @@ test_php:
     DB_DATABASE: ":memory:"
     SESSION_DRIVER: array
   artifacts:
-    reports:
-      junit: storage/logs/test-results.xml
     paths:
       - storage/logs/
     expire_in: 1 week

@@ -29,10 +29,12 @@ class ElasticsearchService
      * @throws AuthenticationException
      * @throws ClientResponseException
      * @throws ServerResponseException
+     * 
+     * @return array
      */
-    public function search(array $params): Elasticsearch|Promise
+    public function search(array $params): array
     {
-        return $this->client()->search($params);
+        return $this->client()->search($params)->asArray();
     }
 
     /**

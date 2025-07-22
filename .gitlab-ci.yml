@@ -24,7 +24,7 @@ test_php:
   image: php:8.4-cli
   before_script:
     - apt-get update -yqq
-    - apt-get install -yqq git curl libpq-dev libcurl4-gnutls-dev libicu-dev libvpx-dev libjpeg-dev libpng-dev libxpm-dev zlib1g-dev libfreetype6-dev libxml2-dev libexpat1-dev libbz2-dev libgmp3-dev libldap2-dev unixodbc-dev libsqlite3-dev libaspell-dev libsnmp-dev libpcre3-dev libtidy-dev libzip-dev libmagickwand-dev
+    - apt-get install -yqq git curl libpq-dev libcurl4-gnutls-dev libicu-dev libvpx-dev libjpeg-dev libpng-dev libxpm-dev zlib1g-dev libfreetype6-dev libxml2-dev libexpat1-dev libbz2-dev libgmp3-dev libldap2-dev unixodbc-dev libsqlite3-dev libaspell-dev libsnmp-dev libpcre3-dev libtidy-dev libzip-dev libmagickwand-dev libonig-dev
     - docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring dom fileinfo zip gd intl
     - pecl install redis imagick xdebug
     - docker-php-ext-enable redis imagick xdebug

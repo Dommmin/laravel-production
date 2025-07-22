@@ -10,8 +10,6 @@ use Elastic\Elasticsearch\Exception\AuthenticationException;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\MissingParameterException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
-use Elastic\Elasticsearch\Response\Elasticsearch;
-use Http\Promise\Promise;
 
 class ElasticsearchService
 {
@@ -29,8 +27,6 @@ class ElasticsearchService
      * @throws AuthenticationException
      * @throws ClientResponseException
      * @throws ServerResponseException
-     * 
-     * @return array
      */
     public function search(array $params): array
     {

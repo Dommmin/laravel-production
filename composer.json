@@ -53,8 +53,9 @@
     },
     "scripts": {
         "larastan": "./vendor/bin/phpstan analyse --memory-limit=2G",
-        "pint": "./vendor/bin/pint",
+        "pint": "./vendor/bin/pint --test",
         "rector": "./vendor/bin/rector",
+        "pest": "composer pest",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

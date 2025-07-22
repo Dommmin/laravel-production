@@ -28,6 +28,7 @@ test_php:
     - docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring dom fileinfo zip gd intl pcntl
     - pecl install redis imagick xdebug
     - docker-php-ext-enable redis imagick xdebug
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     - composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
   script:
     - cp .env.testing .env

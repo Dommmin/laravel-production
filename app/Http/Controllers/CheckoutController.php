@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Order;
 use App\Models\Cart;
-use Inertia\Inertia;
+use App\Models\Order;
+use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CheckoutController extends Controller
 {
@@ -32,7 +33,7 @@ class CheckoutController extends Controller
         return Inertia::render('Checkout/Index', [
             'cartItems' => $cartItems,
             'paymentMethods' => $paymentMethods,
-            'deliveryMethods' => $deliveryMethods
+            'deliveryMethods' => $deliveryMethods,
         ]);
     }
 
@@ -45,11 +46,14 @@ class CheckoutController extends Controller
             'paymentMethod' => 'required|string',
         ]);
 
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () {
             $cartItems = Cart::with('product')->where('user_id', auth()->id())->get();
 
             $totalPrice = $cartItems->sum(function ($cartItem) {
-                return $cartItem->quantity * $cartItem->product->price;
+                /** @var Product $product */
+                $product = $cartItem->product;
+
+                return $cartItem->quantity * $product->price;
             });
 
             $order = Order::create([

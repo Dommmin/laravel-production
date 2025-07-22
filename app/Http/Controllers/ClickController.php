@@ -14,7 +14,7 @@ class ClickController extends Controller
         $click = Click::first();
 
         return Inertia::render('Click', [
-            'click' => $click
+            'click' => $click,
         ]);
     }
 
@@ -22,7 +22,7 @@ class ClickController extends Controller
     {
         Click::firstOrCreate()->increment('times');
 
-        event(new ClickEvent());
+        event(new ClickEvent);
 
         return redirect()->route('clicks.index');
     }

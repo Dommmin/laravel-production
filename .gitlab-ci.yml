@@ -11,7 +11,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   IMAGE_NAMESPACE: dommmin/laravel-production
   REGISTRY: registry.gitlab.com
-  
+
 services:
   - docker:dind
 

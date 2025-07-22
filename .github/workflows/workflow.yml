@@ -20,6 +20,8 @@ jobs:
       image: dommin/php-8.4-fpm:latest
     steps:
       - uses: actions/checkout@v4
+      - name: Mark repo as safe for git
+        run: git config --global --add safe.directory $(pwd)
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
@@ -48,6 +50,8 @@ jobs:
     needs: test_node
     steps:
       - uses: actions/checkout@v4
+      - name: Mark repo as safe for git
+        run: git config --global --add safe.directory $(pwd)
       - name: Download Vite build artifacts
         uses: actions/download-artifact@v4
         with:

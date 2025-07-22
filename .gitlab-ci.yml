@@ -24,6 +24,7 @@ test_php:
   image: dommin/php-8.4-fpm:latest
   needs: [test_node]
   before_script:
+    - git config --global --add safe.directory $(pwd)
     - composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
   script:
     - cp .env.testing .env
@@ -48,6 +49,7 @@ test_node:
   stage: test
   image: dommin/php-8.4-fpm:latest
   before_script:
+    - git config --global --add safe.directory $(pwd)
     - npm ci
     - npm run build
   script:
